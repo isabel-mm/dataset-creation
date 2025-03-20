@@ -47,15 +47,15 @@ st.write('## ¿Qué formato necesitas?')
 st.markdown('---')
 st.write('**JSON:** Formato estructurado ideal para análisis o procesamiento posterior. Cada archivo subido es almacenado como un objeto en una lista JSON.')
 st.write('Ejemplo:')
-st.code('[{"Texto": "Terrible customer service.", "Etiqueta": []}, {"Texto": "Excellent product.", "Etiqueta": []}]')
+st.code('[{"Texto": "Terrible customer service.", "Etiqueta": [NEG]}, {"Texto": "Excellent product.", "Etiqueta": [POS]}]')
 
 st.write('**JSONL:** Formato similar a JSON pero con un objeto por línea. Ideal para procesamiento a gran escala o entrenamiento de modelos de aprendizaje automático.')
 st.write('Ejemplo:')
-st.code('{"Texto": "Terrible customer service.", "Etiqueta": []}\n{"Texto": "Excellent product.", "Etiqueta": []}')
+st.code('{"Texto": "Terrible customer service.", "Etiqueta": [NEG]}\n{"Texto": "Excellent product.", "Etiqueta": [POS]}')
 
 st.write('**CSV:** Formato tabular comúnmente utilizado para manipulación en hojas de cálculo o análisis en pandas.')
 st.write('Ejemplo:')
-st.code('Texto,Etiqueta\n"Terrible customer service.", \n"Excellent product.",')
+st.code('Texto,Etiqueta\n"Terrible customer service.","NEG" \n"Excellent product.","POS"')
 st.markdown('---')
 
 uploaded_files = st.file_uploader('Sube tus archivos .txt', type='txt', accept_multiple_files=True)
