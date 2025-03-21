@@ -72,7 +72,7 @@ def save_as_jsonl(data, content_key, label_keys, output_dir):
 
 st.title('Conversor de TXT a JSON, JSONL, CSV o XML')
 
-st.write('📚 En Lingüística Computacional, es común convertir textos sin estructura en datos estructurados para facilitar su análisis, procesamiento y almacenamiento. Esto permite aplicar técnicas de minería de datos, aprendizaje automático y análisis computacional de manera más eficiente y, en general, permite que la información del corpus sea fácilmente recuperable.')
+st.write('📚 En Lingüística Computacional, es común #convertir textos sin estructura en datos estructurados# para facilitar su análisis, procesamiento y almacenamiento. Esto permite aplicar técnicas de minería de datos, aprendizaje automático y análisis computacional de manera más eficiente y, en general, permite que la información del corpus sea fácilmente recuperable.')
 
 st.write('🔍 ¿Por qué es importante estructurar tus datos? Imagina que estás buscando información en una sala llena de papeles desordenados. Ahora, imagina que estás en una biblioteca perfectamente organizada, donde cada libro tiene etiquetas que indican su autor, fecha, temática, etc. 📖 ¿Dónde crees que encontrarás la información más rápido? 😄')
 
