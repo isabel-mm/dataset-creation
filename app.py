@@ -5,11 +5,9 @@ import os
 import nltk
 from nltk import sent_tokenize
 
-# Descargar el modelo punkt si no está disponible
-try:
-    nltk.data.find('tokenizers/punkt')
-except LookupError:
-    nltk.download('punkt')
+
+# Descargar el modelo punkt en cada ejecución
+nltk.download('punkt')
 
 def process_txt_files(uploaded_files, segment_by_sentences):
     structured_data = []
