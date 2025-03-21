@@ -2,15 +2,23 @@ import streamlit as st
 import pandas as pd
 import json
 import os
+import nltk
+from nltk import sent_tokenize
 
+nltk.download('punkt')
 
-def process_txt_files(uploaded_files):
+def process_txt_files(uploaded_files, segment_by_sentences):
     structured_data = []
     for uploaded_file in uploaded_files:
         if uploaded_file.type == 'text/plain':
             content = uploaded_file.read().decode('utf-8')
             file_name = uploaded_file.name
-            structured_data.append({'filename': file_name, 'content': content})
+            if segment_by_sentences:
+                sentences = sent_tokenize(content)
+                for sentence in sentences:
+                    structured_data.append({'filename': file_name, 'content': sentence})
+            else:
+                structured_data.append({'filename': file_name, 'content': content})
     return structured_data
 
 
@@ -46,26 +54,19 @@ st.title('Conversor de TXT a JSON, JSONL o CSV')
 st.write('## ¿Qué formato necesitas?')
 st.markdown('---')
 st.write('**JSON:** Formato estructurado ideal para análisis o procesamiento posterior. Cada archivo subido es almacenado como un objeto en una lista JSON.')
-st.write('Ejemplo:')
-st.code('[{"Texto": "Terrible customer service.", "Etiqueta": [NEG]}, {"Texto": "Excellent product.", "Etiqueta": [POS]}]')
-
 st.write('**JSONL:** Formato similar a JSON pero con un objeto por línea. Ideal para procesamiento a gran escala o entrenamiento de modelos de aprendizaje automático.')
-st.write('Ejemplo:')
-st.code('{"Texto": "Terrible customer service.", "Etiqueta": [NEG]}\n{"Texto": "Excellent product.", "Etiqueta": [POS]}')
-
 st.write('**CSV:** Formato tabular comúnmente utilizado para manipulación en hojas de cálculo o análisis en pandas.')
-st.write('Ejemplo:')
-st.code('Texto,Etiqueta\n"Terrible customer service.","NEG" \n"Excellent product.","POS"')
 st.markdown('---')
 
 uploaded_files = st.file_uploader('Sube tus archivos .txt', type='txt', accept_multiple_files=True)
 
 if uploaded_files:
+    segment_by_sentences = st.checkbox('Segmentar por oraciones')
     content_key = st.text_input('Nombre para el contenido (ej. "Texto")', value='content')
     label_key = st.text_input('Nombre para la etiqueta (ej. "Etiqueta")', value='label')
     file_name = st.text_input('Nombre del archivo a descargar (sin extensión)', value='structured_data')
 
-    structured_data = process_txt_files(uploaded_files)
+    structured_data = process_txt_files(uploaded_files, segment_by_sentences)
 
     if st.button('Guardar como JSON'):
         json_path, structured_output = save_as_json(structured_data, content_key, label_key, 'output')
