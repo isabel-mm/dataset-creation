@@ -39,14 +39,21 @@ def process_txt_files(uploaded_files, segment_by_sentences):
     return structured_data
 
 
-def process_xml_files(uploaded_files):
+def process_xml_files(uploaded_files, segment_by_sentences):
     structured_data = []
     for uploaded_file in uploaded_files:
         tree = ET.parse(uploaded_file)
         root = tree.getroot()
         file_name = uploaded_file.name
         text_content = ET.tostring(root, encoding='utf-8', method='text').decode('utf-8')
-        structured_data.append({'filename': file_name, 'content': text_content})
+
+        if segment_by_sentences:  # Si se selecciona segmentar por oraciones
+            sentences = punkt_tokenizer.tokenize(text_content)
+            for sentence in sentences:
+                structured_data.append({'filename': file_name, 'content': sentence})
+        else:  # Si no se segmenta
+            structured_data.append({'filename': file_name, 'content': text_content})
+
     return structured_data
 
 
@@ -58,7 +65,7 @@ def save_as_xml(data, content_key, label_keys):
         content_element.text = item['content']
         for key in label_keys:
             label_element = ET.SubElement(entry, key)
-            label_element.text = ''  # Generar <etiqueta></etiqueta> en lugar de <etiqueta/>
+            label_element.text = ''  # Generar <etiqueta></etiqueta>
     xml_str = ET.tostring(root, encoding='utf-8')
     dom = parseString(xml_str)
     return dom.toprettyxml(indent='  ')
@@ -104,7 +111,7 @@ st.markdown('---')
 uploaded_files = st.file_uploader('Sube tus archivos .txt o .xml', type=['txt', 'xml'], accept_multiple_files=True)
 
 if uploaded_files:
-    segment_by_sentences = st.checkbox('Segmentar por oraciones (solo para archivos .txt)')
+    segment_by_sentences = st.checkbox('Segmentar por oraciones (aplica a archivos .txt y .xml)')
     content_key = st.text_input('Nombre para el contenido (ej. "Texto")', value='content')
     labels_input = st.text_input('Nombres de las etiquetas separados por comas (ej. "Etiqueta1, Etiqueta2")')
     label_keys = [label.strip() for label in labels_input.split(',')] if labels_input else ['label']
@@ -113,7 +120,7 @@ if uploaded_files:
     txt_files = [file for file in uploaded_files if file.type == 'text/plain']
     xml_files = [file for file in uploaded_files if file.type == 'text/xml']
 
-    structured_data = process_txt_files(txt_files, segment_by_sentences) + process_xml_files(xml_files)
+    structured_data = process_txt_files(txt_files, segment_by_sentences) + process_xml_files(xml_files, segment_by_sentences)
 
     if st.button('Guardar como JSON'):
         json_data = save_as_json(structured_data, content_key, label_keys, 'output')
