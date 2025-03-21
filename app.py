@@ -85,9 +85,9 @@ with st.expander('## ¿Qué formato necesitas?'):
     st.write('Formato tabular comúnmente utilizado para manipulación en hojas de cálculo o análisis en pandas.')
     st.code('Texto,Etiqueta\n"Terrible customer service.","NEG"\n"Excellent product.","POS"')
 
-    st.write('**XML (Ejemplo con metadatos):**')
+    st.write('**XML:**')
     st.write('Formato estructurado que incluye metadatos definidos por el usuario como autor, tema y fecha.')
-    st.code('<data>\n  <entry>\n    <Texto>Terrible customer service.</Texto>\n    <autor>\n      VACIO\n    </autor>\n    <tema>\n      VACIO\n    </tema>\n    <fecha>\n      VACIO\n    </fecha>\n  </entry>\n</data>')
+    st.code('<data>\n  <entry>\n    <Texto>Terrible customer service.</Texto>\n    <autor>Pepito Pepítez</autor>\n    <tema>reseña</tema>\n    <fecha>2015</fecha>\n  </entry>\n</data>')
 
 
 uploaded_files = st.file_uploader('Sube tus archivos .txt', type=['txt'], accept_multiple_files=True)
