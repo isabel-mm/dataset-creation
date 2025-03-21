@@ -90,11 +90,11 @@ with st.expander('## ¿Qué formato necesitas?'):
     st.code('{"Texto": "Terrible customer service.", "Etiqueta": ["NEG"]}\n{"Texto": "Excellent product.", "Etiqueta": ["POS"]}')
 
     st.write('**CSV:**')
-    st.write('Formato tabular comúnmente utilizado para manipulación en hojas de cálculo o análisis en pandas.')
+    st.write('Formato tabular comúnmente utilizado para manipulación en hojas de cálculo o análisis en pandas. Puede cargarse fácilmente en Excel.')
     st.code('Texto,Etiqueta\n"Terrible customer service.","NEG"\n"Excellent product.","POS"')
 
     st.write('**XML:**')
-    st.write('Formato estructurado que incluye metadatos definidos por el usuario como autor, tema y fecha.')
+    st.write('Formato estructurado que incluye metadatos definidos por el usuario como autor, tema y fecha. Es jerárquico, puedes ir abriendo y cerrando etiquetas para facilitar la lectura.')
     st.code('<data>\n  <entry>\n    <Texto>Terrible customer service.</Texto>\n    <autor>Pepito Pepítez</autor>\n    <tema>reseña</tema>\n    <fecha>2015</fecha>\n  </entry>\n</data>')
 
 
