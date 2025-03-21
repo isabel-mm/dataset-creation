@@ -76,7 +76,7 @@ st.write('📚 En Lingüística Computacional, es común **convertir textos sin 
 
 st.write('🔍 **¿Por qué es importante estructurar tus datos?** Imagina que estás buscando información en una sala llena de papeles desordenados. Ahora, imagina que estás en una biblioteca perfectamente organizada, donde cada libro tiene etiquetas que indican su autor, fecha, temática, etc. 📖 ¿Dónde crees que encontrarás la información más rápido? 😄')
 
-st.write('📂 Los textos no estructurados se convierten en formatos estructurados que pueden organizarse, manipularse y analizarse con facilidad. Los formatos más comunes incluyen JSON, JSONL, CSV y XML, cada uno con sus aplicaciones particulares. En el desplegable de abajo puedes echarle un vistazo a este tipo de formatos.')
+st.write('📂 **Los textos no estructurados se convierten en datos estructurados que pueden organizarse, manipularse y analizarse** con facilidad. Los formatos más comunes incluyen JSON, JSONL, CSV y XML, cada uno con sus aplicaciones particulares. En el desplegable de abajo puedes echarle un vistazo a este tipo de formatos.')
 
 st.write('📥 Sube tus archivos .txt, elige la estructura que deseas, y descarga los resultados en el formato adecuado para tu trabajo.')
 
