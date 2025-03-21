@@ -4,10 +4,22 @@ import json
 import os
 import nltk
 from nltk import sent_tokenize
+import urllib.request
 
 
-# Descargar el modelo punkt en cada ejecución
-nltk.download('punkt')
+# Descargar el modelo punkt desde el GitHub oficial de NLTK
+PUNKT_URL = 'https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages/tokenizers/punkt.zip'
+nltk_data_path = './nltk_data'
+
+if not os.path.exists(nltk_data_path):
+    os.makedirs(nltk_data_path)
+    urllib.request.urlretrieve(PUNKT_URL, os.path.join(nltk_data_path, 'punkt.zip'))
+    import zipfile
+    with zipfile.ZipFile(os.path.join(nltk_data_path, 'punkt.zip'), 'r') as zip_ref:
+        zip_ref.extractall(nltk_data_path)
+
+nltk.data.path.append(nltk_data_path)
+
 
 def process_txt_files(uploaded_files, segment_by_sentences):
     structured_data = []
@@ -16,7 +28,7 @@ def process_txt_files(uploaded_files, segment_by_sentences):
             content = uploaded_file.read().decode('utf-8')
             file_name = uploaded_file.name
             if segment_by_sentences:
-                sentences = sent_tokenize(content, language='english')  # Especificar idioma
+                sentences = sent_tokenize(content, language='english')
                 for sentence in sentences:
                     structured_data.append({'filename': file_name, 'content': sentence})
             else:
