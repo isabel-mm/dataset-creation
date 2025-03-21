@@ -45,13 +45,20 @@ def process_xml_files(uploaded_files, segment_by_sentences):
         tree = ET.parse(uploaded_file)
         root = tree.getroot()
         file_name = uploaded_file.name
-        text_content = ET.tostring(root, encoding='utf-8', method='text').decode('utf-8')
 
-        if segment_by_sentences:  # Si se selecciona segmentar por oraciones
+        # Recolectar todo el texto contenido dentro del archivo XML
+        text_content = ''
+        for elem in root.iter():
+            if elem.text and elem.tag not in ['entry', 'data']:
+                text_content += elem.text.strip() + ' '
+
+        text_content = text_content.strip()
+
+        if segment_by_sentences:
             sentences = punkt_tokenizer.tokenize(text_content)
             for sentence in sentences:
                 structured_data.append({'filename': file_name, 'content': sentence})
-        else:  # Si no se segmenta
+        else:
             structured_data.append({'filename': file_name, 'content': text_content})
 
     return structured_data
@@ -65,7 +72,7 @@ def save_as_xml(data, content_key, label_keys):
         content_element.text = item['content']
         for key in label_keys:
             label_element = ET.SubElement(entry, key)
-            label_element.text = ''  # Generar <etiqueta></etiqueta>
+            label_element.text = ''
     xml_str = ET.tostring(root, encoding='utf-8')
     dom = parseString(xml_str)
     return dom.toprettyxml(indent='  ')
