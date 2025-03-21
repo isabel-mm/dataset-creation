@@ -94,7 +94,7 @@ if uploaded_files:
 
     if st.button('Guardar como JSON'):
         json_path, structured_output = save_as_json(structured_data, content_key, label_key, 'output')
-        st.success(f'Datos guardados como JSON en: {json_path}')
+        st.success(f'¡Datos estructurados! Ya puedes descargarlos.')
         st.download_button(label='Descargar JSON', data=json.dumps(structured_output, indent=4), file_name=f'{file_name}.json', mime='application/json')
 
     if st.button('Guardar como JSONL'):
