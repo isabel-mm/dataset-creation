@@ -72,7 +72,7 @@ def save_as_jsonl(data, content_key, label_keys, output_dir):
 
 st.title('Conversor de TXT a JSON, JSONL, CSV o XML')
 
-with st.expander('¿Qué formato necesitas?'):
+with st.expander('### ¿Qué formato necesitas?'):
     st.write('### JSON:')
     st.write('Formato estructurado ideal para análisis o procesamiento posterior. Cada archivo subido se almacena como un objeto en una lista JSON.')
     st.code('[{"Texto": "Terrible customer service.", "Etiqueta": ["NEG"]}, {"Texto": "Excellent product.", "Etiqueta": ["POS"]}]')
