@@ -46,7 +46,6 @@ def process_xml_files(uploaded_files, segment_by_sentences):
         root = tree.getroot()
         file_name = uploaded_file.name
 
-        # Recolectar todo el texto contenido dentro del archivo XML
         text_content = ''
         for elem in root.iter():
             if elem.text and elem.tag not in ['entry', 'data']:
@@ -72,7 +71,7 @@ def save_as_xml(data, content_key, label_keys):
         content_element.text = item['content']
         for key in label_keys:
             label_element = ET.SubElement(entry, key)
-            label_element.text = ''
+            label_element.text = 'VACIO'  # Ahora se muestra explícitamente como <tema>VACIO</tema>
     xml_str = ET.tostring(root, encoding='utf-8')
     dom = parseString(xml_str)
     return dom.toprettyxml(indent='  ')
@@ -111,7 +110,7 @@ st.write('**CSV:**')
 st.code('Texto,Etiqueta\n"Terrible customer service.","NEG"\n"Excellent product.","POS"')
 
 st.write('**XML:**')
-st.code('<data><entry><Texto>Terrible customer service.</Texto><Etiqueta></Etiqueta></entry></data>')
+st.code('<data><entry><Texto>Terrible customer service.</Texto><Etiqueta>VACIO</Etiqueta></entry></data>')
 
 st.markdown('---')
 
