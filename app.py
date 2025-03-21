@@ -58,7 +58,7 @@ def save_as_xml(data, content_key, label_keys):
         content_element.text = item['content']
         for key in label_keys:
             label_element = ET.SubElement(entry, key)
-            label_element.text = None  # Cambiar '' por None para tener etiquetas vacías correctamente.
+            label_element.text = ''  # Asignar cadena vacía para obtener <etiqueta></etiqueta>
     xml_str = ET.tostring(root, encoding='utf-8')
     dom = parseString(xml_str)
     return dom.toprettyxml(indent='  ')
@@ -97,7 +97,7 @@ st.write('**CSV:**')
 st.code('Texto,Etiqueta\n"Terrible customer service.","NEG"\n"Excellent product.","POS"')
 
 st.write('**XML:**')
-st.code('<data><entry><Texto>Terrible customer service.</Texto><Etiqueta>NEG</Etiqueta></entry></data>')
+st.code('<data><entry><Texto>Terrible customer service.</Texto><Etiqueta></Etiqueta></entry></data>')
 
 st.markdown('---')
 
