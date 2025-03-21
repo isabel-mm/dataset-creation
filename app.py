@@ -3,7 +3,7 @@ import pandas as pd
 import json
 import os
 import nltk
-from nltk import sent_tokenize
+from nltk.tokenize import PunktSentenceTokenizer
 import urllib.request
 
 
@@ -20,6 +20,8 @@ if not os.path.exists(nltk_data_path):
 
 nltk.data.path.append(nltk_data_path)
 
+# Crear un tokenizer personalizado
+punkt_tokenizer = PunktSentenceTokenizer()
 
 def process_txt_files(uploaded_files, segment_by_sentences):
     structured_data = []
@@ -28,7 +30,7 @@ def process_txt_files(uploaded_files, segment_by_sentences):
             content = uploaded_file.read().decode('utf-8')
             file_name = uploaded_file.name
             if segment_by_sentences:
-                sentences = sent_tokenize(content, language='english')
+                sentences = punkt_tokenizer.tokenize(content)
                 for sentence in sentences:
                     structured_data.append({'filename': file_name, 'content': sentence})
             else:
