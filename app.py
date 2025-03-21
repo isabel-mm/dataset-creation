@@ -16,7 +16,7 @@ def process_txt_files(uploaded_files, segment_by_sentences):
             content = uploaded_file.read().decode('utf-8')
             file_name = uploaded_file.name
             if segment_by_sentences:
-                sentences = sent_tokenize(content)
+                sentences = sent_tokenize(content, language='english')  # Especificar idioma
                 for sentence in sentences:
                     structured_data.append({'filename': file_name, 'content': sentence})
             else:
