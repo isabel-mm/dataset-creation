@@ -67,46 +67,38 @@ def save_as_xml(data, content_key, label_keys):
 def save_as_json(data, content_key, label_keys, output_dir):
     os.makedirs(output_dir, exist_ok=True)
     structured_output = [{content_key: item['content'], **{key: [] for key in label_keys}} for item in data]
-    json_path = os.path.join(output_dir, 'structured_data.json')
-    with open(json_path, 'w', encoding='utf-8') as f:
-        json.dump(structured_output, f, indent=4, ensure_ascii=False)
-    return json_path, structured_output
+    return structured_output
 
 
 def save_as_csv(data, content_key, label_keys, output_dir):
-    os.makedirs(output_dir, exist_ok=True)
     columns = [content_key] + label_keys
     df = pd.DataFrame([{content_key: item['content'], **{key: '' for key in label_keys}} for item in data], columns=columns)
-    csv_path = os.path.join(output_dir, 'structured_data.csv')
-    df.to_csv(csv_path, index=False, encoding='utf-8')
-    return csv_path, df
+    return df
 
 
 def save_as_jsonl(data, content_key, label_keys, output_dir):
-    os.makedirs(output_dir, exist_ok=True)
-    jsonl_path = os.path.join(output_dir, 'structured_data.jsonl')
-    with open(jsonl_path, 'w', encoding='utf-8') as f:
-        for item in data:
-            json_line = json.dumps({content_key: item['content'], **{key: [] for key in label_keys}}, ensure_ascii=False)
-            f.write(json_line + '\n')
-    return jsonl_path
+    jsonl_data = '\n'.join([json.dumps({content_key: item['content'], **{key: [] for key in label_keys}}, ensure_ascii=False) for item in data])
+    return jsonl_data
 
 
 st.title('Conversor de TXT/XML a JSON, JSONL, CSV o XML')
 
 st.write('## ¿Qué formato necesitas?')
 st.markdown('---')
-st.write('**JSON:** Formato estructurado ideal para análisis o procesamiento posterior. Cada archivo subido es almacenado como un objeto en una lista JSON.')
-st.write('Ejemplo: [{"Texto": "Terrible customer service.", "Etiqueta": ["NEG"]}, {"Texto": "Excellent product.", "Etiqueta": ["POS"]}]')
 
-st.write('**JSONL:** Formato similar a JSON pero con un objeto por línea. Ideal para procesamiento a gran escala o entrenamiento de modelos de aprendizaje automático.')
-st.write('Ejemplo: {"Texto": "Terrible customer service.", "Etiqueta": ["NEG"]}\n{"Texto": "Excellent product.", "Etiqueta": ["POS"]}')
+# Ejemplos de formatos
+st.write('**JSON:**')
+st.code('[{"Texto": "Terrible customer service.", "Etiqueta": ["NEG"]}, {"Texto": "Excellent product.", "Etiqueta": ["POS"]}]')
 
-st.write('**CSV:** Formato tabular comúnmente utilizado para manipulación en hojas de cálculo o análisis en pandas.')
-st.write('Ejemplo: Texto,Etiqueta\n"Terrible customer service.","NEG"\n"Excellent product.","POS"')
+st.write('**JSONL:**')
+st.code('{"Texto": "Terrible customer service.", "Etiqueta": ["NEG"]}\n{"Texto": "Excellent product.", "Etiqueta": ["POS"]}')
 
-st.write('**XML:** Formato estructurado con etiquetas jerárquicas. Ideal para interoperabilidad entre sistemas.')
-st.write('Ejemplo: <data><entry><Texto>Terrible customer service.</Texto><Etiqueta>NEG</Etiqueta></entry></data>')
+st.write('**CSV:**')
+st.code('Texto,Etiqueta\n"Terrible customer service.","NEG"\n"Excellent product.","POS"')
+
+st.write('**XML:**')
+st.code('<data><entry><Texto>Terrible customer service.</Texto><Etiqueta>NEG</Etiqueta></entry></data>')
+
 st.markdown('---')
 
 uploaded_files = st.file_uploader('Sube tus archivos .txt o .xml', type=['txt', 'xml'], accept_multiple_files=True)
@@ -122,6 +114,19 @@ if uploaded_files:
     xml_files = [file for file in uploaded_files if file.type == 'text/xml']
 
     structured_data = process_txt_files(txt_files, segment_by_sentences) + process_xml_files(xml_files)
+
+    if st.button('Guardar como JSON'):
+        json_data = save_as_json(structured_data, content_key, label_keys, 'output')
+        st.download_button(label='Descargar JSON', data=json.dumps(json_data, indent=4), file_name=f'{file_name}.json', mime='application/json')
+
+    if st.button('Guardar como JSONL'):
+        jsonl_data = save_as_jsonl(structured_data, content_key, label_keys, 'output')
+        st.download_button(label='Descargar JSONL', data=jsonl_data.encode('utf-8'), file_name=f'{file_name}.jsonl', mime='application/json')
+
+    if st.button('Guardar como CSV'):
+        df = save_as_csv(structured_data, content_key, label_keys, 'output')
+        csv_data = df.to_csv(index=False).encode('utf-8')
+        st.download_button(label='Descargar CSV', data=csv_data, file_name=f'{file_name}.csv', mime='text/csv')
 
     if st.button('Guardar como XML'):
         xml_data = save_as_xml(structured_data, content_key, label_keys)
