@@ -72,6 +72,12 @@ def save_as_jsonl(data, content_key, label_keys, output_dir):
 
 st.title('Conversor de TXT a JSON, JSONL, CSV o XML')
 
+st.write('En Lingüística Computacional, es común convertir textos sin estructura en datos estructurados para facilitar su análisis, procesamiento y almacenamiento. Esto permite aplicar técnicas de minería de datos, aprendizaje automático y análisis computacional de manera más eficiente.')
+
+st.write('Los textos no estructurados se convierten en formatos estructurados que pueden organizarse, manipularse y analizarse con facilidad. Los formatos más comunes incluyen JSON, JSONL, CSV y XML, cada uno con sus aplicaciones particulares. Esta aplicación permite transformar tus archivos .txt a cualquiera de estos formatos, permitiendo también segmentar el contenido en oraciones si lo deseas.')
+
+st.write('Sube tus archivos .txt, elige la estructura que deseas, y descarga los resultados en el formato adecuado para tu trabajo.')
+
 with st.expander('## ¿Qué formato necesitas?'):
     st.write('**JSON:**')
     st.write('Formato estructurado ideal para análisis o procesamiento posterior. Cada archivo subido se almacena como un objeto en una lista JSON.')
