@@ -72,20 +72,20 @@ def save_as_jsonl(data, content_key, label_keys, output_dir):
 
 st.title('Conversor de TXT a JSON, JSONL, CSV o XML')
 
-with st.expander('### ¿Qué formato necesitas?'):
-    st.write('## JSON:')
+with st.expander('# ¿Qué formato necesitas?'):
+    st.write('### JSON:')
     st.write('Formato estructurado ideal para análisis o procesamiento posterior. Cada archivo subido se almacena como un objeto en una lista JSON.')
     st.code('[{"Texto": "Terrible customer service.", "Etiqueta": ["NEG"]}, {"Texto": "Excellent product.", "Etiqueta": ["POS"]}]')
 
-    st.write('## JSONL:')
+    st.write('### JSONL:')
     st.write('Formato similar a JSON pero con un objeto por línea. Ideal para procesamiento a gran escala o entrenamiento de modelos de aprendizaje automático.')
     st.code('{"Texto": "Terrible customer service.", "Etiqueta": ["NEG"]}\n{"Texto": "Excellent product.", "Etiqueta": ["POS"]}')
 
-    st.write('## CSV:')
+    st.write('### CSV:')
     st.write('Formato tabular comúnmente utilizado para manipulación en hojas de cálculo o análisis en pandas.')
     st.code('Texto,Etiqueta\n"Terrible customer service.","NEG"\n"Excellent product.","POS"')
 
-    st.write('## XML:')
+    st.write('### XML:')
     st.write('Formato estructurado que incluye metadatos definidos por el usuario como autor, tema y fecha.')
     st.code('<data>\n  <entry>\n    <Texto>Terrible customer service.</Texto>\n    <autor>\n      VACIO\n    </autor>\n    <tema>\n      VACIO\n    </tema>\n    <fecha>\n      VACIO\n    </fecha>\n  </entry>\n</data>')
 
