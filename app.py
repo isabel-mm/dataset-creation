@@ -58,7 +58,7 @@ def save_as_xml(data, content_key, label_keys):
         content_element.text = item['content']
         for key in label_keys:
             label_element = ET.SubElement(entry, key)
-            label_element.text = None  # Usar None en lugar de '' para crear <etiqueta></etiqueta>
+            label_element.text = ''  # Generar <etiqueta></etiqueta> en lugar de <etiqueta/>
     xml_str = ET.tostring(root, encoding='utf-8')
     dom = parseString(xml_str)
     return dom.toprettyxml(indent='  ')
