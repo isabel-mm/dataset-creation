@@ -39,30 +39,6 @@ def process_txt_files(uploaded_files, segment_by_sentences):
     return structured_data
 
 
-def process_xml_files(uploaded_files, segment_by_sentences):
-    structured_data = []
-    for uploaded_file in uploaded_files:
-        tree = ET.parse(uploaded_file)
-        root = tree.getroot()
-        file_name = uploaded_file.name
-
-        text_content = ''
-        for elem in root.iter():
-            if elem.text and elem.tag not in ['entry', 'data']:
-                text_content += elem.text.strip() + ' '
-
-        text_content = text_content.strip()
-
-        if segment_by_sentences:
-            sentences = punkt_tokenizer.tokenize(text_content)
-            for sentence in sentences:
-                structured_data.append({'filename': file_name, 'content': sentence})
-        else:
-            structured_data.append({'filename': file_name, 'content': text_content})
-
-    return structured_data
-
-
 def save_as_xml(data, content_key, label_keys):
     root = ET.Element('data')
     for item in data:
@@ -94,7 +70,7 @@ def save_as_jsonl(data, content_key, label_keys, output_dir):
     return jsonl_data
 
 
-st.title('Conversor de TXT/XML a JSON, JSONL, CSV o XML')
+st.title('Conversor de TXT a JSON, JSONL, CSV o XML')
 
 st.write('## ¿Qué formato necesitas?')
 st.markdown('---')
@@ -109,24 +85,21 @@ st.code('{"Texto": "Terrible customer service.", "Etiqueta": ["NEG"]}\n{"Texto":
 st.write('**CSV:**')
 st.code('Texto,Etiqueta\n"Terrible customer service.","NEG"\n"Excellent product.","POS"')
 
-st.write('**XML:**')
-st.code('<data><entry><Texto>Terrible customer service.</Texto><Etiqueta>\n      VACIO\n    </Etiqueta></entry></data>')
+st.write('**XML:** Ejemplo con metadatos')
+st.code('<data>\n  <entry>\n    <Texto>Terrible customer service.</Texto>\n    <autor>\n      VACIO\n    </autor>\n    <tema>\n      VACIO\n    </tema>\n    <fecha>\n      VACIO\n    </fecha>\n  </entry>\n</data>')
 
 st.markdown('---')
 
-uploaded_files = st.file_uploader('Sube tus archivos .txt o .xml', type=['txt', 'xml'], accept_multiple_files=True)
+uploaded_files = st.file_uploader('Sube tus archivos .txt', type=['txt'], accept_multiple_files=True)
 
 if uploaded_files:
-    segment_by_sentences = st.checkbox('Segmentar por oraciones (aplica a archivos .txt y .xml)')
+    segment_by_sentences = st.checkbox('Segmentar por oraciones (aplica a archivos .txt)')
     content_key = st.text_input('Nombre para el contenido (ej. "Texto")', value='content')
-    labels_input = st.text_input('Nombres de las etiquetas separados por comas (ej. "Etiqueta1, Etiqueta2")')
+    labels_input = st.text_input('Nombres de las etiquetas separados por comas (ej. "autor, tema, fecha")')
     label_keys = [label.strip() for label in labels_input.split(',')] if labels_input else ['label']
     file_name = st.text_input('Nombre del archivo a descargar (sin extensión)', value='structured_data')
 
-    txt_files = [file for file in uploaded_files if file.type == 'text/plain']
-    xml_files = [file for file in uploaded_files if file.type == 'text/xml']
-
-    structured_data = process_txt_files(txt_files, segment_by_sentences) + process_xml_files(xml_files, segment_by_sentences)
+    structured_data = process_txt_files(uploaded_files, segment_by_sentences)
 
     if st.button('Guardar como JSON'):
         json_data = save_as_json(structured_data, content_key, label_keys, 'output')
