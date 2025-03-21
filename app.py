@@ -47,7 +47,7 @@ def save_as_xml(data, content_key, label_keys):
         content_element.text = item['content']
         for key in label_keys:
             label_element = ET.SubElement(entry, key)
-            label_element.text = '\n      VACIO\n    '  # Formato con indentación
+            label_element.text = '\n      VACIO\n    '
     xml_str = ET.tostring(root, encoding='utf-8')
     dom = parseString(xml_str)
     return dom.toprettyxml(indent='  ')
@@ -72,23 +72,23 @@ def save_as_jsonl(data, content_key, label_keys, output_dir):
 
 st.title('Conversor de TXT a JSON, JSONL, CSV o XML')
 
-st.write('## ¿Qué formato necesitas?')
-st.markdown('---')
+with st.expander('¿Qué formato necesitas?'):
+    st.write('### JSON:')
+    st.write('Formato estructurado ideal para análisis o procesamiento posterior. Cada archivo subido se almacena como un objeto en una lista JSON.')
+    st.code('[{"Texto": "Terrible customer service.", "Etiqueta": ["NEG"]}, {"Texto": "Excellent product.", "Etiqueta": ["POS"]}]')
 
-# Ejemplos de formatos
-st.write('**JSON:**')
-st.code('[{"Texto": "Terrible customer service.", "Etiqueta": ["NEG"]}, {"Texto": "Excellent product.", "Etiqueta": ["POS"]}]')
+    st.write('### JSONL:')
+    st.write('Formato similar a JSON pero con un objeto por línea. Ideal para procesamiento a gran escala o entrenamiento de modelos de aprendizaje automático.')
+    st.code('{"Texto": "Terrible customer service.", "Etiqueta": ["NEG"]}\n{"Texto": "Excellent product.", "Etiqueta": ["POS"]}')
 
-st.write('**JSONL:**')
-st.code('{"Texto": "Terrible customer service.", "Etiqueta": ["NEG"]}\n{"Texto": "Excellent product.", "Etiqueta": ["POS"]}')
+    st.write('### CSV:')
+    st.write('Formato tabular comúnmente utilizado para manipulación en hojas de cálculo o análisis en pandas.')
+    st.code('Texto,Etiqueta\n"Terrible customer service.","NEG"\n"Excellent product.","POS"')
 
-st.write('**CSV:**')
-st.code('Texto,Etiqueta\n"Terrible customer service.","NEG"\n"Excellent product.","POS"')
+    st.write('### XML (Ejemplo con metadatos):')
+    st.write('Formato estructurado que incluye metadatos definidos por el usuario como autor, tema y fecha.')
+    st.code('<data>\n  <entry>\n    <Texto>Terrible customer service.</Texto>\n    <autor>\n      VACIO\n    </autor>\n    <tema>\n      VACIO\n    </tema>\n    <fecha>\n      VACIO\n    </fecha>\n  </entry>\n</data>')
 
-st.write('**XML:** Ejemplo con metadatos')
-st.code('<data>\n  <entry>\n    <Texto>Terrible customer service.</Texto>\n    <autor>\n      VACIO\n    </autor>\n    <tema>\n      VACIO\n    </tema>\n    <fecha>\n      VACIO\n    </fecha>\n  </entry>\n</data>')
-
-st.markdown('---')
 
 uploaded_files = st.file_uploader('Sube tus archivos .txt', type=['txt'], accept_multiple_files=True)
 
