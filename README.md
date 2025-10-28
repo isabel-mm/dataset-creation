@@ -10,13 +10,13 @@ En el ámbito de la lingüística computacional, la estructuración de datos fac
 
 ## ⚙️ Funcionalidades principales
 
-📂 Carga múltiple de archivos .txt
+### 📂 Carga múltiple de archivos .txt
 Permite subir uno o varios textos a la vez.
 
-✂️ Segmentación opcional por oraciones
+### ✂️ Segmentación opcional por oraciones
 Utiliza el tokenizador Punkt de NLTK para dividir el texto en unidades oracionales, facilitando el tratamiento posterior en tareas de anotación o modelado.
 
-🧩 Conversión a múltiples formatos estructurados
+### 🧩 Conversión a múltiples formatos estructurados
 
 JSON: lista estructurada de objetos.
 
@@ -26,10 +26,10 @@ CSV: formato tabular compatible con Excel y pandas.
 
 XML: estructura jerárquica con etiquetas definidas por el usuario.
 
-🏷️ Definición personalizada de campos y etiquetas
+### 🏷️ Definición personalizada de campos y etiquetas
 El usuario puede especificar el nombre del campo de contenido (p. ej. "Texto") y las etiquetas o metadatos que desee incluir (p. ej. "autor", "tema", "fecha").
 
-💾 Descarga directa de resultados
+### 💾 Descarga directa de resultados
 Tras el procesamiento, el usuario puede descargar los datos en el formato deseado.
 
 ## 🧾 Ejemplo de uso
