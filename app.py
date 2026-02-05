@@ -108,8 +108,8 @@ st.sidebar.subheader("Dataset")
 segment_by_sentences = st.sidebar.checkbox('Tokenización por oraciones (punkt)', value=True)
 
 st.sidebar.subheader("🧽 Preprocesamiento")
-do_lowercase = st.sidebar.checkbox('Convertir a minúsculas')
-do_remove_punct = st.sidebar.checkbox('Quitar puntuación')
+do_lowercase = st.sidebar.checkbox('Normalizar a minúscula')
+do_remove_punct = st.sidebar.checkbox('Eliminar puntuación')
 
 st.sidebar.subheader("📋 Estructura")
 content_key = st.sidebar.text_input('Etiqueta de contenido (key)', value='texto')
