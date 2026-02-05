@@ -62,18 +62,18 @@ st.set_page_config(page_title="PLN Data Structurer", page_icon="🤖")
 st.title('Pipeline de Estructuración de Datos para PLN')
 
 st.markdown("""
-En el **Procesamiento del Lenguaje Natural (PLN)**, la calidad de los modelos (como Transformers o LLMs) depende directamente de la estructura del *dataset*. Convertir texto plano en formatos estructurados es el primer paso esencial para cualquier tarea de minería de texto, análisis de sentimiento o entrenamiento supervisado.
+En el **procesamiento del lenguaje natural (PLN)**, la calidad de los modelos (como Transformers o LLMs) depende directamente de la estructura del *dataset*. Convertir texto plano en formatos estructurados es el primer paso esencial para cualquier tarea de minería de texto, análisis de sentimiento o entrenamiento supervisado.
 
 Esta herramienta transforma archivos `.txt` crudos en formatos interoperables, permitiendo una recuperación de información eficiente y una preparación de datos estandarizada para flujos de trabajo científicos.
 """)
 
-with st.expander('📊 Arquitectura de los Formatos'):
+with st.expander('📊 ¿Qué formato elijo para mi proyecto?'):
     col_a, col_b = st.columns(2)
     with col_a:
-        st.write('**JSON / JSONL:** Ideales para modelos de Machine Learning y bases de datos NoSQL. El formato JSONL es el estándar para entrenar modelos con grandes volúmenes de datos línea a línea.')
+        st.write('**JSON / JSONL:** Ideales para modelos de Machine Learning y bases de datos NoSQL. El formato JSONL es el estándar para entrenar modelos con grandes volúmenes de datos que pueden visualizarse línea a línea.')
         st.write('**CSV:** El estándar para análisis estadístico y manipulación con librerías como Pandas o herramientas de hojas de cálculo.')
     with col_b:
-        st.write('**XML:** Crucial en proyectos que requieren metadatos jerárquicos complejos o compatibilidad con estándares de anotación lingüística.')
+        st.write('**XML:** Crucial en proyectos que requieren metadatos jerárquicos complejos o compatibilidad con muchos estándares de anotación lingüística.')
 
 st.divider()
 
@@ -81,7 +81,7 @@ st.divider()
 uploaded_files = st.file_uploader('Cargar archivos de texto (.txt)', type=['txt'], accept_multiple_files=True)
 
 if uploaded_files:
-    st.sidebar.header("Configuración del Dataset")
+    st.sidebar.header("Configuración del dataset")
     segment_by_sentences = st.sidebar.checkbox('Tokenización por oraciones (Punkt)', value=True)
     content_key = st.sidebar.text_input('Etiqueta de contenido (key)', value='texto')
     labels_input = st.sidebar.text_input('Etiquetas de metadatos (separadas por comas)', value='sentimiento, categoria')
@@ -103,7 +103,7 @@ if uploaded_files:
     st.divider()
     
     # --- BOTONES DE DESCARGA ---
-    st.write("### Exportar Dataset")
+    st.write("### Exportar dataset")
     c1, c2, c3, c4 = st.columns(4)
 
     with c1:
