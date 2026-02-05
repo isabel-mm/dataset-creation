@@ -7,121 +7,117 @@ import xml.etree.ElementTree as ET
 from xml.dom.minidom import parseString
 from nltk.tokenize import PunktSentenceTokenizer
 import urllib.request
+import zipfile
 
+# --- CONFIGURACIÓN DE NLTK ---
+@st.cache_resource
+def setup_nltk():
+    nltk_data_path = './nltk_data'
+    if not os.path.exists(os.path.join(nltk_data_path, 'tokenizers/punkt')):
+        os.makedirs(nltk_data_path, exist_ok=True)
+        url = 'https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages/tokenizers/punkt.zip'
+        zip_path = os.path.join(nltk_data_path, 'punkt.zip')
+        urllib.request.urlretrieve(url, zip_path)
+        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+            zip_ref.extractall(nltk_data_path)
+    nltk.data.path.append(nltk_data_path)
+    return PunktSentenceTokenizer()
 
-# Descargar el modelo punkt desde el GitHub oficial de NLTK
-PUNKT_URL = 'https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages/tokenizers/punkt.zip'
-nltk_data_path = './nltk_data'
+punkt_tokenizer = setup_nltk()
 
-if not os.path.exists(nltk_data_path):
-    os.makedirs(nltk_data_path)
-    urllib.request.urlretrieve(PUNKT_URL, os.path.join(nltk_data_path, 'punkt.zip'))
-    import zipfile
-    with zipfile.ZipFile(os.path.join(nltk_data_path, 'punkt.zip'), 'r') as zip_ref:
-        zip_ref.extractall(nltk_data_path)
-
-nltk.data.path.append(nltk_data_path)
-
-# Crear un tokenizer personalizado
-punkt_tokenizer = PunktSentenceTokenizer()
-
+# --- FUNCIONES DE PROCESAMIENTO ---
 def process_txt_files(uploaded_files, segment_by_sentences):
     structured_data = []
     for uploaded_file in uploaded_files:
-        content = uploaded_file.read().decode('utf-8')
+        try:
+            content = uploaded_file.read().decode('utf-8')
+        except UnicodeDecodeError:
+            content = uploaded_file.read().decode('latin-1')
+            
         file_name = uploaded_file.name
         if segment_by_sentences:
             sentences = punkt_tokenizer.tokenize(content)
             for sentence in sentences:
-                structured_data.append({'filename': file_name, 'content': sentence})
+                structured_data.append({'fuente': file_name, 'contenido': sentence.strip()})
         else:
-            structured_data.append({'filename': file_name, 'content': content})
+            structured_data.append({'fuente': file_name, 'contenido': content.strip()})
     return structured_data
 
-
 def save_as_xml(data, content_key, label_keys):
-    root = ET.Element('data')
+    root = ET.Element('corpus')
     for item in data:
-        entry = ET.SubElement(root, 'entry')
+        entry = ET.SubElement(root, 'documento')
         content_element = ET.SubElement(entry, content_key)
-        content_element.text = item['content']
+        content_element.text = item['contenido']
         for key in label_keys:
             label_element = ET.SubElement(entry, key)
-            label_element.text = '\n      VACIO\n    '
+            label_element.text = 'PENDIENTE'
     xml_str = ET.tostring(root, encoding='utf-8')
     dom = parseString(xml_str)
     return dom.toprettyxml(indent='  ')
 
+# --- INTERFAZ DE STREAMLIT ---
+st.set_page_config(page_title="PLN Data Structurer", page_icon="🤖")
 
-def save_as_json(data, content_key, label_keys, output_dir):
-    os.makedirs(output_dir, exist_ok=True)
-    structured_output = [{content_key: item['content'], **{key: [] for key in label_keys}} for item in data]
-    return structured_output
+st.title('Pipeline de Estructuración de Datos para PLN')
 
+st.markdown("""
+En el **Procesamiento del Lenguaje Natural (PLN)**, la calidad de los modelos (como Transformers o LLMs) depende directamente de la estructura del *dataset*. Convertir texto plano en formatos estructurados es el primer paso esencial para cualquier tarea de minería de texto, análisis de sentimiento o entrenamiento supervisado.
 
-def save_as_csv(data, content_key, label_keys, output_dir):
-    columns = [content_key] + label_keys
-    df = pd.DataFrame([{content_key: item['content'], **{key: '' for key in label_keys}} for item in data], columns=columns)
-    return df
+Esta herramienta transforma archivos `.txt` crudos en formatos interoperables, permitiendo una recuperación de información eficiente y una preparación de datos estandarizada para flujos de trabajo científicos.
+""")
 
+with st.expander('📊 Arquitectura de los Formatos'):
+    col_a, col_b = st.columns(2)
+    with col_a:
+        st.write('**JSON / JSONL:** Ideales para modelos de Machine Learning y bases de datos NoSQL. El formato JSONL es el estándar para entrenar modelos con grandes volúmenes de datos línea a línea.')
+        st.write('**CSV:** El estándar para análisis estadístico y manipulación con librerías como Pandas o herramientas de hojas de cálculo.')
+    with col_b:
+        st.write('**XML:** Crucial en proyectos que requieren metadatos jerárquicos complejos o compatibilidad con estándares de anotación lingüística.')
 
-def save_as_jsonl(data, content_key, label_keys, output_dir):
-    jsonl_data = '\n'.join([json.dumps({content_key: item['content'], **{key: [] for key in label_keys}}, ensure_ascii=False) for item in data])
-    return jsonl_data
+st.divider()
 
-
-st.title('Conversor de TXT a JSON, JSONL, CSV o XML')
-
-st.write('📚 En Lingüística Computacional, es común **convertir textos sin estructura en datos estructurados** para facilitar su análisis, procesamiento y almacenamiento. Esto permite aplicar técnicas de minería de datos, aprendizaje automático y análisis computacional de manera más eficiente y, en general, permite que la información del corpus sea fácilmente recuperable.')
-
-st.write('🔍 **¿Por qué es importante estructurar tus datos?** Imagina que estás buscando información en una sala llena de papeles desordenados. Ahora, imagina que estás en una biblioteca perfectamente organizada, donde cada libro tiene etiquetas que indican su autor, fecha, temática, etc. 📖 ¿Dónde crees que encontrarás la información más rápido? 😄')
-
-st.write('📂 **Los textos no estructurados se convierten en datos estructurados que pueden organizarse, manipularse y analizarse** con facilidad. Los formatos más comunes incluyen JSON, JSONL, CSV y XML, cada uno con sus aplicaciones particulares. En el desplegable de abajo puedes echarle un vistazo a este tipo de formatos.')
-
-st.write('📥 Sube tus archivos .txt, elige la estructura que deseas, y descarga los resultados en el formato adecuado para tu trabajo.')
-
-with st.expander('## ¿Qué formato necesitas?'):
-    st.write('**JSON:**')
-    st.write('Formato estructurado ideal para análisis o procesamiento posterior. Cada archivo subido se almacena como un objeto en una lista JSON.')
-    st.code('[{"Texto": "Terrible customer service.", "Etiqueta": ["NEG"]}, {"Texto": "Excellent product.", "Etiqueta": ["POS"]}]')
-
-    st.write('**JSONL:**')
-    st.write('Formato similar a JSON pero con un objeto por línea. Ideal para procesamiento a gran escala o entrenamiento de modelos de aprendizaje automático.')
-    st.code('{"Texto": "Terrible customer service.", "Etiqueta": ["NEG"]}\n{"Texto": "Excellent product.", "Etiqueta": ["POS"]}')
-
-    st.write('**CSV:**')
-    st.write('Formato tabular comúnmente utilizado para manipulación en hojas de cálculo o análisis en pandas. Puede cargarse fácilmente en Excel.')
-    st.code('Texto,Etiqueta\n"Terrible customer service.","NEG"\n"Excellent product.","POS"')
-
-    st.write('**XML:**')
-    st.write('Formato estructurado que incluye metadatos definidos por el usuario como autor, tema y fecha. Es jerárquico, puedes ir abriendo y cerrando etiquetas para facilitar la lectura.')
-    st.code('<data>\n  <entry>\n    <Texto>Terrible customer service.</Texto>\n    <autor>Pepito Pepítez</autor>\n    <tema>reseña</tema>\n    <fecha>2015</fecha>\n  </entry>\n</data>')
-
-
-uploaded_files = st.file_uploader('Sube tus archivos .txt', type=['txt'], accept_multiple_files=True)
+# --- CONFIGURACIÓN DE CARGA ---
+uploaded_files = st.file_uploader('Cargar archivos de texto (.txt)', type=['txt'], accept_multiple_files=True)
 
 if uploaded_files:
-    segment_by_sentences = st.checkbox('Segmentar por oraciones (aplica a archivos .txt)')
-    content_key = st.text_input('Nombre para el contenido (ej. "Texto")', value='content')
-    labels_input = st.text_input('Nombres de las etiquetas separados por comas (ej. "autor, tema, fecha")')
-    label_keys = [label.strip() for label in labels_input.split(',')] if labels_input else ['label']
-    file_name = st.text_input('Nombre del archivo a descargar (sin extensión)', value='structured_data')
+    st.sidebar.header("Configuración del Dataset")
+    segment_by_sentences = st.sidebar.checkbox('Tokenización por oraciones (Punkt)', value=True)
+    content_key = st.sidebar.text_input('Etiqueta de contenido (key)', value='texto')
+    labels_input = st.sidebar.text_input('Etiquetas de metadatos (separadas por comas)', value='sentimiento, categoria')
+    file_output_name = st.sidebar.text_input('Nombre del archivo de salida', value='dataset_procesado')
 
-    structured_data = process_txt_files(uploaded_files, segment_by_sentences)
+    label_keys = [label.strip() for label in labels_input.split(',')] if labels_input else []
+    
+    # Procesamiento
+    with st.spinner('Procesando tokens...'):
+        structured_data = process_txt_files(uploaded_files, segment_by_sentences)
+        df = pd.DataFrame([{content_key: item['contenido'], **{key: '' for key in label_keys}} for item in structured_data])
 
-    if st.button('Guardar como JSON'):
-        json_data = save_as_json(structured_data, content_key, label_keys, 'output')
-        st.download_button(label='Descargar JSON', data=json.dumps(json_data, indent=4), file_name=f'{file_name}.json', mime='application/json')
+    st.success(f"Procesamiento completado: {len(structured_data)} registros generados.")
 
-    if st.button('Guardar como JSONL'):
-        jsonl_data = save_as_jsonl(structured_data, content_key, label_keys, 'output')
-        st.download_button(label='Descargar JSONL', data=jsonl_data.encode('utf-8'), file_name=f'{file_name}.jsonl', mime='application/json')
+    # Vista previa
+    st.write("### Vista previa del Dataset")
+    st.dataframe(df.head(10), use_container_width=True)
 
-    if st.button('Guardar como CSV'):
-        df = save_as_csv(structured_data, content_key, label_keys, 'output')
+    st.divider()
+    
+    # --- BOTONES DE DESCARGA ---
+    st.write("### Exportar Dataset")
+    c1, c2, c3, c4 = st.columns(4)
+
+    with c1:
+        json_str = json.dumps([{content_key: item['contenido'], **{key: [] for key in label_keys}} for item in structured_data], indent=4, ensure_ascii=False)
+        st.download_button('Descargar JSON', data=json_str, file_name=f'{file_output_name}.json', mime='application/json', use_container_width=True)
+
+    with c2:
+        jsonl_str = '\n'.join([json.dumps({content_key: item['contenido'], **{key: [] for key in label_keys}}, ensure_ascii=False) for item in structured_data])
+        st.download_button('Descargar JSONL', data=jsonl_str, file_name=f'{file_output_name}.jsonl', mime='application/jsonl', use_container_width=True)
+
+    with c3:
         csv_data = df.to_csv(index=False).encode('utf-8')
-        st.download_button(label='Descargar CSV', data=csv_data, file_name=f'{file_name}.csv', mime='text/csv')
+        st.download_button('Descargar CSV', data=csv_data, file_name=f'{file_output_name}.csv', mime='text/csv', use_container_width=True)
 
-    if st.button('Guardar como XML'):
+    with c4:
         xml_data = save_as_xml(structured_data, content_key, label_keys)
-        st.download_button(label='Descargar XML', data=xml_data, file_name=f'{file_name}.xml', mime='application/xml')
+        st.download_button('Descargar XML', data=xml_data, file_name=f'{file_output_name}.xml', mime='application/xml', use_container_width=True)
