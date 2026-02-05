@@ -119,7 +119,7 @@ file_output_name = st.sidebar.text_input('Nombre del archivo de salida', value='
 label_keys = [label.strip() for label in labels_input.split(',')] if labels_input else []
 
 st.title('**IS-A-BUILDER**: conversor de texto a datos estructurados')
-st.caption('© 2026 Moyano Moreno, I.')
+st.caption('© Isabel Moyano Moreno | 2026 | Versión 1.0')
 
 st.markdown("""
 En el **procesamiento del lenguaje natural (PLN)**, la calidad de los modelos —desde clasificadores más clásicos hasta los recientes grandes modelos de lenguaje (LLM)— depende directamente de la compilación, estructura y limpieza del corpus lingüístico o *dataset*.
