@@ -87,7 +87,7 @@ uploaded_files = st.file_uploader('Cargar archivos de texto (.txt)', type=['txt'
 
 if uploaded_files:
     st.sidebar.header("Configuración del dataset")
-    segment_by_sentences = st.sidebar.checkbox('Tokenización por oraciones (Punkt)', value=True)
+    segment_by_sentences = st.sidebar.checkbox('Tokenización por oraciones (punkt)', value=True)
     content_key = st.sidebar.text_input('Etiqueta de contenido (key)', value='texto')
     labels_input = st.sidebar.text_input('Etiquetas de metadatos', value='sentimiento, categoria')
     file_output_name = st.sidebar.text_input('Nombre del archivo de salida', value='dataset_procesado')
