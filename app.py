@@ -122,7 +122,7 @@ label_keys = [label.strip() for label in labels_input.split(',')] if labels_inpu
 
 # Inserción del Logo
 if os.path.exists("logo.png"):
-    st.image("logo.png", width=150) # Puedes ajustar el ancho (width) a tu gusto
+    st.image("logo.png", width=400)
 
 st.title('**IS-A-BUILDER**: conversor de texto a datos estructurados')
 st.caption('© 2026 Moyano Moreno, I.')
