@@ -6,6 +6,7 @@ import pandas as pd
 import json
 import os
 import nltk
+import re
 import xml.etree.ElementTree as ET
 from xml.dom.minidom import parseString
 from nltk.tokenize import PunktSentenceTokenizer
@@ -29,7 +30,14 @@ def setup_nltk():
 punkt_tokenizer = setup_nltk()
 
 # --- FUNCIONES DE PROCESAMIENTO ---
-def process_txt_files(uploaded_files, segment_by_sentences):
+def clean_text(text, lowercase, remove_punct):
+    if lowercase:
+        text = text.lower()
+    if remove_punct:
+        text = re.sub(r'[^\w\s]', '', text)
+    return text
+
+def process_txt_files(uploaded_files, segment_by_sentences, lowercase, remove_punct):
     structured_data = []
     for uploaded_file in uploaded_files:
         try:
@@ -38,6 +46,8 @@ def process_txt_files(uploaded_files, segment_by_sentences):
             content = uploaded_file.read().decode('latin-1')
             
         file_name = uploaded_file.name
+        content = clean_text(content, lowercase, remove_punct)
+
         if segment_by_sentences:
             sentences = punkt_tokenizer.tokenize(content)
             for sentence in sentences:
@@ -46,8 +56,9 @@ def process_txt_files(uploaded_files, segment_by_sentences):
             structured_data.append({'fuente': file_name, 'contenido': content.strip()})
     return structured_data
 
-def process_manual_text(text, segment_by_sentences):
+def process_manual_text(text, segment_by_sentences, lowercase, remove_punct):
     structured_data = []
+    text = clean_text(text, lowercase, remove_punct)
     if segment_by_sentences:
         sentences = punkt_tokenizer.tokenize(text)
         for sentence in sentences:
@@ -60,6 +71,8 @@ def save_as_xml(data, content_key, label_keys):
     root = ET.Element('corpus')
     for item in data:
         entry = ET.SubElement(root, 'documento')
+        id_element = ET.SubElement(entry, 'id')
+        id_element.text = str(item.get('id_registro', ''))
         content_element = ET.SubElement(entry, content_key)
         content_element.text = item['contenido']
         for key in label_keys:
@@ -70,7 +83,7 @@ def save_as_xml(data, content_key, label_keys):
     return dom.toprettyxml(indent='  ')
 
 # --- INTERFAZ DE STREAMLIT ---
-st.set_page_config(page_title="IS-A-BUILDER: conversor de texto a datos estructurados", page_icon="🤖")
+st.set_page_config(page_title="IS-A-BUILDER: conversor de texto a datos estructurados", page_icon="🤖", layout="wide")
 
 # Título y Atribución
 st.title('**IS-A-BUILDER**: conversor de texto a datos estructurados')
@@ -82,89 +95,85 @@ En el **procesamiento del lenguaje natural (PLN)**, la calidad de los modelos �
 **IS-A-BUILDER** ha sido diseñado específicamente como un recurso pedagógico para estudiantes y personas curiosas e interesadas en el PLN. Esta herramienta facilita la transición del texto plano (`.txt`) a formatos interoperables y estructurados (**JSON, JSONL, CSV, XML**), permitiendo una preparación de datos estandarizada.
 """)
 
-with st.expander('📊 ¿Qué formato elijo para mi proyecto?'):
-    col_a, col_b = st.columns(2)
-    with col_a:
-        st.write('**JSON / JSONL:** Estándar para modelos de Machine Learning y bases de datos NoSQL.')
-        st.write('**CSV:** Ideal para análisis estadístico y manipulación rápida en Pandas o Excel.')
-    with col_b:
-        st.write('**XML:** Crucial para proyectos con metadatos jerárquicos y estándares de anotación lingüística.')
-
 st.divider()
 
-# --- SELECCIÓN DE ENTRADA ---
-tab1, tab2 = st.tabs(["📁 Subir archivos", "✍️ Pegar texto"])
-
-structured_data = []
-
-with tab1:
-    uploaded_files = st.file_uploader('Cargar archivos de texto (.txt)', type=['txt'], accept_multiple_files=True)
-
-with tab2:
-    manual_text = st.text_area("Pega aquí el texto que deseas estructurar:", height=200)
-
-# Sidebar para configuración
-st.sidebar.header("Configuración del dataset")
+# --- SIDEBAR CONFIGURACIÓN ---
+st.sidebar.header("⚙️ Configuración del dataset")
 segment_by_sentences = st.sidebar.checkbox('Tokenización por oraciones (punkt)', value=True)
+
+st.sidebar.subheader("🧽 Preprocesamiento")
+do_lowercase = st.sidebar.checkbox('Convertir a minúsculas')
+do_remove_punct = st.sidebar.checkbox('Quitar puntuación')
+
+st.sidebar.subheader("📋 Estructura")
 content_key = st.sidebar.text_input('Etiqueta de contenido (key)', value='texto')
 labels_input = st.sidebar.text_input('Etiquetas de metadatos', value='sentimiento, categoria')
 file_output_name = st.sidebar.text_input('Nombre del archivo de salida', value='dataset_procesado')
 
 label_keys = [label.strip() for label in labels_input.split(',')] if labels_input else []
 
-# Lógica de unión de datos
-if uploaded_files:
-    structured_data.extend(process_txt_files(uploaded_files, segment_by_sentences))
+# --- SELECCIÓN DE ENTRADA ---
+tab1, tab2 = st.tabs(["📁 Subir archivos", "✍️ Pegar texto"])
+structured_data = []
 
+with tab1:
+    uploaded_files = st.file_uploader('Cargar archivos de texto (.txt)', type=['txt'], accept_multiple_files=True)
+with tab2:
+    manual_text = st.text_area("Pega aquí el texto que deseas estructurar:", height=200)
+
+# Lógica de procesamiento
+if uploaded_files:
+    structured_data.extend(process_txt_files(uploaded_files, segment_by_sentences, do_lowercase, do_remove_punct))
 if manual_text.strip():
-    structured_data.extend(process_manual_text(manual_text, segment_by_sentences))
+    structured_data.extend(process_manual_text(manual_text, segment_by_sentences, do_lowercase, do_remove_punct))
 
 # --- PROCESAMIENTO Y VISUALIZACIÓN ---
 if structured_data:
     with st.spinner('Estructurando datos...'):
-        df = pd.DataFrame([{content_key: item['contenido'], **{key: '' for key in label_keys}} for item in structured_data])
+        df = pd.DataFrame([{content_key: item['contenido'], 'fuente': item['fuente'], **{key: '' for key in label_keys}} for item in structured_data])
+        # Añadir ID único
+        df.insert(0, 'id_registro', range(1, len(df) + 1))
         
-        # Cálculo de métricas
+        # Métricas
         full_text = " ".join(df[content_key].astype(str))
         total_words = len(full_text.split())
         total_chars = len(full_text)
 
-    # Mostrar métricas del corpus
-    st.success(f"Procesamiento completado: {len(structured_data)} ítems generados.")
+    st.success(f"Procesamiento completado: {len(structured_data)} registros generados.")
     
     m1, m2, m3 = st.columns(3)
-    m1.metric("Total de ítems", len(structured_data))
-    m2.metric("Total de palabras", total_words)
-    m3.metric("Total de caracteres", total_chars)
+    m1.metric("Registros", len(structured_data))
+    m2.metric("Palabras", total_words)
+    m3.metric("Caracteres", total_chars)
 
-    # Vista previa
-    st.write("### Vista previa del dataset")
-    st.dataframe(df.head(10), use_container_width=True)
+    st.write("### Vista previa del dataset estructurado")
+    st.dataframe(df.head(15), use_container_width=True)
+
+    
 
     st.divider()
     
-    # --- BOTONES DE DESCARGA ---
-    st.write("### Exportar dataset")
+    # --- EXPORTACIÓN ---
+    st.write("### 📥 Exportar dataset")
     c1, c2, c3, c4 = st.columns(4)
+    
+    export_data = df.to_dict(orient='records')
 
     with c1:
-        json_str = json.dumps([{content_key: item['contenido'], **{key: [] for key in label_keys}} for item in structured_data], indent=4, ensure_ascii=False)
+        json_str = json.dumps(export_data, indent=4, ensure_ascii=False)
         st.download_button('JSON', data=json_str, file_name=f'{file_output_name}.json', mime='application/json', use_container_width=True)
-
     with c2:
-        jsonl_str = '\n'.join([json.dumps({content_key: item['contenido'], **{key: [] for key in label_keys}}, ensure_ascii=False) for item in structured_data])
+        jsonl_str = '\n'.join([json.dumps(record, ensure_ascii=False) for record in export_data])
         st.download_button('JSONL', data=jsonl_str, file_name=f'{file_output_name}.jsonl', mime='application/jsonl', use_container_width=True)
-
     with c3:
         csv_data = df.to_csv(index=False).encode('utf-8')
         st.download_button('CSV', data=csv_data, file_name=f'{file_output_name}.csv', mime='text/csv', use_container_width=True)
-
     with c4:
-        xml_data = save_as_xml(structured_data, content_key, label_keys)
+        # Pasamos los datos con el ID para el XML
+        xml_data = save_as_xml(df.to_dict(orient='records'), content_key, label_keys)
         st.download_button('XML', data=xml_data, file_name=f'{file_output_name}.xml', mime='application/xml', use_container_width=True)
 else:
-    st.info("Por favor, sube un archivo o escribe texto en la pestaña correspondiente para comenzar.")
+    st.info("Por favor, sube un archivo o escribe texto para comenzar.")
 
-# Pie de página lateral
 st.sidebar.markdown("---")
 st.sidebar.info(f"**Cómo citar:**\n\nMoyano Moreno, I. (2026). *IS-A-BUILDER: conversor de texto a datos estructurados* [Software].")
