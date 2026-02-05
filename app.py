@@ -34,6 +34,7 @@ def clean_text(text, lowercase, remove_punct):
     if lowercase:
         text = text.lower()
     if remove_punct:
+        # Elimina puntuación manteniendo espacios
         text = re.sub(r'[^\w\s]', '', text)
     return text
 
@@ -51,9 +52,11 @@ def process_txt_files(uploaded_files, segment_by_sentences, lowercase, remove_pu
         if segment_by_sentences:
             sentences = punkt_tokenizer.tokenize(content)
             for sentence in sentences:
-                structured_data.append({'fuente': file_name, 'contenido': sentence.strip()})
+                if sentence.strip():
+                    structured_data.append({'fuente': file_name, 'contenido': sentence.strip()})
         else:
-            structured_data.append({'fuente': file_name, 'contenido': content.strip()})
+            if content.strip():
+                structured_data.append({'fuente': file_name, 'contenido': content.strip()})
     return structured_data
 
 def process_manual_text(text, segment_by_sentences, lowercase, remove_punct):
@@ -62,22 +65,32 @@ def process_manual_text(text, segment_by_sentences, lowercase, remove_punct):
     if segment_by_sentences:
         sentences = punkt_tokenizer.tokenize(text)
         for sentence in sentences:
-            structured_data.append({'fuente': 'entrada_manual', 'contenido': sentence.strip()})
+            if sentence.strip():
+                structured_data.append({'fuente': 'entrada_manual', 'contenido': sentence.strip()})
     else:
-        structured_data.append({'fuente': 'entrada_manual', 'contenido': text.strip()})
+        if text.strip():
+            structured_data.append({'fuente': 'entrada_manual', 'contenido': text.strip()})
     return structured_data
 
+# FIX: Ahora recibe content_key para evitar el KeyError
 def save_as_xml(data, content_key, label_keys):
     root = ET.Element('corpus')
     for item in data:
         entry = ET.SubElement(root, 'documento')
-        id_element = ET.SubElement(entry, 'id')
+        # Añadir ID
+        id_element = ET.SubElement(entry, 'id_registro')
         id_element.text = str(item.get('id_registro', ''))
+        # Añadir Contenido usando la clave dinámica
         content_element = ET.SubElement(entry, content_key)
-        content_element.text = item['contenido']
+        content_element.text = str(item.get(content_key, ''))
+        # Añadir Fuente
+        source_element = ET.SubElement(entry, 'fuente')
+        source_element.text = str(item.get('fuente', ''))
+        # Añadir etiquetas vacías
         for key in label_keys:
             label_element = ET.SubElement(entry, key)
             label_element.text = 'PENDIENTE'
+            
     xml_str = ET.tostring(root, encoding='utf-8')
     dom = parseString(xml_str)
     return dom.toprettyxml(indent='  ')
@@ -85,7 +98,6 @@ def save_as_xml(data, content_key, label_keys):
 # --- INTERFAZ DE STREAMLIT ---
 st.set_page_config(page_title="IS-A-BUILDER: conversor de texto a datos estructurados", page_icon="🤖", layout="wide")
 
-# Título y Atribución
 st.title('**IS-A-BUILDER**: conversor de texto a datos estructurados')
 st.caption('© 2026 Moyano Moreno, I.')
 
@@ -97,7 +109,7 @@ En el **procesamiento del lenguaje natural (PLN)**, la calidad de los modelos �
 
 st.divider()
 
-# --- SIDEBAR CONFIGURACIÓN ---
+# --- SIDEBAR ---
 st.sidebar.header("⚙️ Configuración del dataset")
 segment_by_sentences = st.sidebar.checkbox('Tokenización por oraciones (punkt)', value=True)
 
@@ -112,44 +124,45 @@ file_output_name = st.sidebar.text_input('Nombre del archivo de salida', value='
 
 label_keys = [label.strip() for label in labels_input.split(',')] if labels_input else []
 
-# --- SELECCIÓN DE ENTRADA ---
+# --- ENTRADA DE DATOS ---
 tab1, tab2 = st.tabs(["📁 Subir archivos", "✍️ Pegar texto"])
-structured_data = []
+raw_data_list = []
 
 with tab1:
     uploaded_files = st.file_uploader('Cargar archivos de texto (.txt)', type=['txt'], accept_multiple_files=True)
+    if uploaded_files:
+        raw_data_list.extend(process_txt_files(uploaded_files, segment_by_sentences, do_lowercase, do_remove_punct))
+
 with tab2:
     manual_text = st.text_area("Pega aquí el texto que deseas estructurar:", height=200)
+    if manual_text.strip():
+        raw_data_list.extend(process_manual_text(manual_text, segment_by_sentences, do_lowercase, do_remove_punct))
 
-# Lógica de procesamiento
-if uploaded_files:
-    structured_data.extend(process_txt_files(uploaded_files, segment_by_sentences, do_lowercase, do_remove_punct))
-if manual_text.strip():
-    structured_data.extend(process_manual_text(manual_text, segment_by_sentences, do_lowercase, do_remove_punct))
-
-# --- PROCESAMIENTO Y VISUALIZACIÓN ---
-if structured_data:
+# --- PROCESAMIENTO FINAL ---
+if raw_data_list:
     with st.spinner('Estructurando datos...'):
-        df = pd.DataFrame([{content_key: item['contenido'], 'fuente': item['fuente'], **{key: '' for key in label_keys}} for item in structured_data])
-        # Añadir ID único
-        df.insert(0, 'id_registro', range(1, len(df) + 1))
+        # Construimos el DataFrame usando la clave de contenido definida por el usuario
+        df = pd.DataFrame([{
+            'id_registro': i + 1,
+            'fuente': item['fuente'],
+            content_key: item['contenido'],
+            **{key: '' for key in label_keys}
+        } for i, item in enumerate(raw_data_list)])
         
         # Métricas
-        full_text = " ".join(df[content_key].astype(str))
-        total_words = len(full_text.split())
-        total_chars = len(full_text)
+        full_text_str = " ".join(df[content_key].astype(str))
+        total_words = len(full_text_str.split())
+        total_chars = len(full_text_str)
 
-    st.success(f"Procesamiento completado: {len(structured_data)} registros generados.")
+    st.success(f"Procesamiento completado: {len(df)} registros generados.")
     
-    m1, m2, m3 = st.columns(3)
-    m1.metric("Registros", len(structured_data))
-    m2.metric("Palabras", total_words)
-    m3.metric("Caracteres", total_chars)
+    col_m1, col_m2, col_m3 = st.columns(3)
+    col_m1.metric("Registros", len(df))
+    col_m2.metric("Palabras", total_words)
+    col_m3.metric("Caracteres", total_chars)
 
-    st.write("### Vista previa del dataset estructurado")
+    st.write("### Vista previa del dataset")
     st.dataframe(df.head(15), use_container_width=True)
-
-    
 
     st.divider()
     
@@ -157,23 +170,24 @@ if structured_data:
     st.write("### 📥 Exportar dataset")
     c1, c2, c3, c4 = st.columns(4)
     
-    export_data = df.to_dict(orient='records')
+    # Convertimos a lista de diccionarios para formatos JSON
+    export_list = df.to_dict(orient='records')
 
     with c1:
-        json_str = json.dumps(export_data, indent=4, ensure_ascii=False)
+        json_str = json.dumps(export_list, indent=4, ensure_ascii=False)
         st.download_button('JSON', data=json_str, file_name=f'{file_output_name}.json', mime='application/json', use_container_width=True)
     with c2:
-        jsonl_str = '\n'.join([json.dumps(record, ensure_ascii=False) for record in export_data])
+        jsonl_str = '\n'.join([json.dumps(r, ensure_ascii=False) for r in export_list])
         st.download_button('JSONL', data=jsonl_str, file_name=f'{file_output_name}.jsonl', mime='application/jsonl', use_container_width=True)
     with c3:
         csv_data = df.to_csv(index=False).encode('utf-8')
         st.download_button('CSV', data=csv_data, file_name=f'{file_output_name}.csv', mime='text/csv', use_container_width=True)
     with c4:
-        # Pasamos los datos con el ID para el XML
-        xml_data = save_as_xml(df.to_dict(orient='records'), content_key, label_keys)
+        # Aquí pasamos content_key para que la función XML sepa cómo buscar el texto
+        xml_data = save_as_xml(export_list, content_key, label_keys)
         st.download_button('XML', data=xml_data, file_name=f'{file_output_name}.xml', mime='application/xml', use_container_width=True)
 else:
-    st.info("Por favor, sube un archivo o escribe texto para comenzar.")
+    st.info("Sube archivos o pega texto para generar el dataset estructurado.")
 
 st.sidebar.markdown("---")
 st.sidebar.info(f"**Cómo citar:**\n\nMoyano Moreno, I. (2026). *IS-A-BUILDER: conversor de texto a datos estructurados* [Software].")
