@@ -128,4 +128,4 @@ if uploaded_files:
 
 # Pie de página lateral
 st.sidebar.markdown("---")
-st.sidebar.info(f"**Cita sugerida:**\n\nMoyano Moreno (2026). *text2structure: conversor de texto a datos estructurados* [Software].")
+st.sidebar.info(f"**Cómo citar:**\n\nMoyano Moreno, I. (2026). *text2structure: conversor de texto a datos estructurados* [Software].")
