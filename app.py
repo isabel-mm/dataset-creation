@@ -130,12 +130,12 @@ if structured_data:
         total_chars = len(full_text)
 
     # Mostrar métricas del corpus
-    st.success(f"Procesamiento completado: {len(structured_data)} registros generados.")
+    st.success(f"Procesamiento completado: {len(structured_data)} ítems generados.")
     
     m1, m2, m3 = st.columns(3)
-    m1.metric("Total de Registros", len(structured_data))
-    m2.metric("Total de Palabras", total_words)
-    m3.metric("Total de Caracteres", total_chars)
+    m1.metric("Total de ítems", len(structured_data))
+    m2.metric("Total de palabras", total_words)
+    m3.metric("Total de caracteres", total_chars)
 
     # Vista previa
     st.write("### Vista previa del dataset")
