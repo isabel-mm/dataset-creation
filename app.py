@@ -34,7 +34,6 @@ def clean_text(text, lowercase, remove_punct):
     if lowercase:
         text = text.lower()
     if remove_punct:
-        # Elimina puntuación manteniendo espacios
         text = re.sub(r'[^\w\s]', '', text)
     return text
 
@@ -72,21 +71,16 @@ def process_manual_text(text, segment_by_sentences, lowercase, remove_punct):
             structured_data.append({'fuente': 'entrada_manual', 'contenido': text.strip()})
     return structured_data
 
-# FIX: Ahora recibe content_key para evitar el KeyError
 def save_as_xml(data, content_key, label_keys):
     root = ET.Element('corpus')
     for item in data:
         entry = ET.SubElement(root, 'documento')
-        # Añadir ID
         id_element = ET.SubElement(entry, 'id_registro')
         id_element.text = str(item.get('id_registro', ''))
-        # Añadir Contenido usando la clave dinámica
         content_element = ET.SubElement(entry, content_key)
         content_element.text = str(item.get(content_key, ''))
-        # Añadir Fuente
         source_element = ET.SubElement(entry, 'fuente')
         source_element.text = str(item.get('fuente', ''))
-        # Añadir etiquetas vacías
         for key in label_keys:
             label_element = ET.SubElement(entry, key)
             label_element.text = 'PENDIENTE'
@@ -98,19 +92,14 @@ def save_as_xml(data, content_key, label_keys):
 # --- INTERFAZ DE STREAMLIT ---
 st.set_page_config(page_title="IS-A-BUILDER: conversor de texto a datos estructurados", page_icon="🤖", layout="wide")
 
-st.title('**IS-A-BUILDER**: conversor de texto a datos estructurados')
-st.caption('© 2026 Moyano Moreno, I.')
+# --- BARRA LATERAL (FIJA) ---
+st.sidebar.header("⚙️ Configuración")
 
-st.markdown("""
-En el **procesamiento del lenguaje natural (PLN)**, la calidad de los modelos —desde clasificadores más clásicos hasta los recientes grandes modelos de lenguaje (LLM)— depende directamente de la estructura y limpieza del *dataset*.
+# Sección de Cita (Ahora fija arriba)
+st.sidebar.info(f"**Cómo citar:**\n\nMoyano Moreno, I. (2026). *IS-A-BUILDER: conversor de texto a datos estructurados* [Software].")
+st.sidebar.markdown("---")
 
-**IS-A-BUILDER** ha sido diseñado específicamente como un recurso pedagógico para estudiantes y personas curiosas e interesadas en el PLN. Esta herramienta facilita la transición del texto plano (`.txt`) a formatos interoperables y estructurados (**JSON, JSONL, CSV, XML**), permitiendo una preparación de datos estandarizada.
-""")
-
-st.divider()
-
-# --- SIDEBAR ---
-st.sidebar.header("⚙️ Configuración del dataset")
+st.sidebar.subheader("Dataset")
 segment_by_sentences = st.sidebar.checkbox('Tokenización por oraciones (punkt)', value=True)
 
 st.sidebar.subheader("🧽 Preprocesamiento")
@@ -123,6 +112,18 @@ labels_input = st.sidebar.text_input('Etiquetas de metadatos', value='sentimient
 file_output_name = st.sidebar.text_input('Nombre del archivo de salida', value='dataset_procesado')
 
 label_keys = [label.strip() for label in labels_input.split(',')] if labels_input else []
+
+# --- CUERPO PRINCIPAL ---
+st.title('**IS-A-BUILDER**: conversor de texto a datos estructurados')
+st.caption('© 2026 Moyano Moreno, I.')
+
+st.markdown("""
+En el **procesamiento del lenguaje natural (PLN)**, la calidad de los modelos —desde clasificadores más clásicos hasta los recientes grandes modelos de lenguaje (LLM)— depende directamente de la estructura y limpieza del *dataset*.
+
+**IS-A-BUILDER** ha sido diseñado específicamente como un recurso pedagógico para estudiantes y personas curiosas e interesadas en el PLN. Esta herramienta facilita la transición del texto plano (`.txt`) a formatos interoperables y estructurados (**JSON, JSONL, CSV, XML**), permitiendo una preparación de datos estandarizada.
+""")
+
+st.divider()
 
 # --- ENTRADA DE DATOS ---
 tab1, tab2 = st.tabs(["📁 Subir archivos", "✍️ Pegar texto"])
@@ -138,10 +139,9 @@ with tab2:
     if manual_text.strip():
         raw_data_list.extend(process_manual_text(manual_text, segment_by_sentences, do_lowercase, do_remove_punct))
 
-# --- PROCESAMIENTO FINAL ---
+# --- RESULTADOS ---
 if raw_data_list:
     with st.spinner('Estructurando datos...'):
-        # Construimos el DataFrame usando la clave de contenido definida por el usuario
         df = pd.DataFrame([{
             'id_registro': i + 1,
             'fuente': item['fuente'],
@@ -149,15 +149,14 @@ if raw_data_list:
             **{key: '' for key in label_keys}
         } for i, item in enumerate(raw_data_list)])
         
-        # Métricas
         full_text_str = " ".join(df[content_key].astype(str))
         total_words = len(full_text_str.split())
         total_chars = len(full_text_str)
 
-    st.success(f"Procesamiento completado: {len(df)} registros generados.")
+    st.success(f"Procesamiento completado: {len(df)} ítems generados.")
     
     col_m1, col_m2, col_m3 = st.columns(3)
-    col_m1.metric("Registros", len(df))
+    col_m1.metric("Ítems", len(df))
     col_m2.metric("Palabras", total_words)
     col_m3.metric("Caracteres", total_chars)
 
@@ -166,11 +165,9 @@ if raw_data_list:
 
     st.divider()
     
-    # --- EXPORTACIÓN ---
     st.write("### 📥 Exportar dataset")
     c1, c2, c3, c4 = st.columns(4)
     
-    # Convertimos a lista de diccionarios para formatos JSON
     export_list = df.to_dict(orient='records')
 
     with c1:
@@ -183,11 +180,7 @@ if raw_data_list:
         csv_data = df.to_csv(index=False).encode('utf-8')
         st.download_button('CSV', data=csv_data, file_name=f'{file_output_name}.csv', mime='text/csv', use_container_width=True)
     with c4:
-        # Aquí pasamos content_key para que la función XML sepa cómo buscar el texto
         xml_data = save_as_xml(export_list, content_key, label_keys)
         st.download_button('XML', data=xml_data, file_name=f'{file_output_name}.xml', mime='application/xml', use_container_width=True)
 else:
     st.info("Sube archivos o pega texto para generar el dataset estructurado.")
-
-st.sidebar.markdown("---")
-st.sidebar.info(f"**Cómo citar:**\n\nMoyano Moreno, I. (2026). *IS-A-BUILDER: conversor de texto a datos estructurados* [Software].")
