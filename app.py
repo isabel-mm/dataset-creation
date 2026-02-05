@@ -103,7 +103,7 @@ with tab1:
 with tab2:
     manual_text = st.text_area("Pega aquí el texto que deseas estructurar:", height=200)
 
-# Sidebar para configuración común
+# Sidebar para configuración
 st.sidebar.header("Configuración del dataset")
 segment_by_sentences = st.sidebar.checkbox('Tokenización por oraciones (punkt)', value=True)
 content_key = st.sidebar.text_input('Etiqueta de contenido (key)', value='texto')
@@ -123,8 +123,19 @@ if manual_text.strip():
 if structured_data:
     with st.spinner('Estructurando datos...'):
         df = pd.DataFrame([{content_key: item['contenido'], **{key: '' for key in label_keys}} for item in structured_data])
+        
+        # Cálculo de métricas
+        full_text = " ".join(df[content_key].astype(str))
+        total_words = len(full_text.split())
+        total_chars = len(full_text)
 
+    # Mostrar métricas del corpus
     st.success(f"Procesamiento completado: {len(structured_data)} registros generados.")
+    
+    m1, m2, m3 = st.columns(3)
+    m1.metric("Total de Registros", len(structured_data))
+    m2.metric("Total de Palabras", total_words)
+    m3.metric("Total de Caracteres", total_chars)
 
     # Vista previa
     st.write("### Vista previa del dataset")
