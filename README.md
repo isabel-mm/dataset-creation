@@ -1,47 +1,28 @@
-# 🧠 Conversor de TXT a JSON, JSONL, CSV o XML
+# IS-A-BUILDER: Conversor de Texto a Datos Estructurados
 
-## 📘 Descripción general
+**IS-A-BUILDER** es una herramienta pedagógica diseñada para estudiantes e investigadores que se inician en el **Procesamiento del Lenguaje Natural (PLN)**. Su objetivo es facilitar la transición de archivos de texto plano (.txt) a formatos de datos estructurados e interoperables.
 
-Esta aplicación permite convertir archivos de texto plano (.txt) en formatos estructurados ampliamente utilizados en análisis lingüístico computacional, minería de texto y procesamiento de lenguaje natural (PLN).
+## 🚀 Funcionalidades
+- **Opciones de carga:** Soporta subida de archivos `.txt` y entrada manual de texto (copy-paste).
+- **Tokenización:** Segmentación automática de oraciones utilizando el tokenizador de NLTK.
+- **Preprocesamiento:** Opciones para normalización a minúsculas y eliminación de la puntuación.
+- **Métricas:** Conteo en tiempo real de ítems (filas), palabras y caracteres.
+- **Exportación multi-formato:** Descarga de datasets en **JSON, JSONL, CSV y XML**.
 
-Fue desarrollada con Streamlit, con el objetivo de ofrecer una interfaz sencilla e intuitiva para investigadores, lingüistas y estudiantes que trabajan con corpus y necesitan estructurar sus datos textuales en formatos como JSON, JSONL, CSV o XML.
+## 🚀 Uso
+Puedes utilizar **IS-A-BUILDER** de dos formas:
 
-En el ámbito de la lingüística computacional, la estructuración de datos facilita la aplicación de métodos automáticos y reproducibles para el análisis de corpus, la extracción terminológica, la anotación lingüística y el entrenamiento de modelos supervisados.
+### 🌐 Uso en línea (Recomendado)
+Accede directamente a la herramienta desplegada en la nube sin instalar nada:
+**[Inserta aquí el enlace de Streamlit Cloud]**
 
-## ⚙️ Funcionalidades principales
+### 💻 Instalación y Uso Local
+1. Clonar el repositorio.
+2. Instalar dependencias: `pip install -r requirements.txt`.
+3. Ejecutar la app: `streamlit run app.py`.
 
-### 📂 Carga múltiple de archivos .txt
-Permite subir uno o varios textos a la vez.
+## 🎓 Cita Sugerida
+Moyano Moreno, I. (2026). *IS-A-BUILDER: conversor de texto a datos estructurados* [Software]. 
 
-### ✂️ Segmentación opcional por oraciones
-Utiliza el tokenizador Punkt de NLTK para dividir el texto en unidades oracionales, facilitando el tratamiento posterior en tareas de anotación o modelado.
-
-### 🧩 Conversión a múltiples formatos estructurados
-
-JSON: lista estructurada de objetos.
-
-JSONL: un objeto JSON por línea, ideal para entrenamiento de modelos.
-
-CSV: formato tabular compatible con Excel y pandas.
-
-XML: estructura jerárquica con etiquetas definidas por el usuario.
-
-### 🏷️ Definición personalizada de campos y etiquetas
-El usuario puede especificar el nombre del campo de contenido (p. ej. "Texto") y las etiquetas o metadatos que desee incluir (p. ej. "autor", "tema", "fecha").
-
-### 💾 Descarga directa de resultados
-Tras el procesamiento, el usuario puede descargar los datos en el formato deseado.
-
-## 🧾 Ejemplo de uso
-
-Sube uno o varios archivos .txt.
-
-(Opcional) Marca la casilla "Segmentar por oraciones" si deseas dividir el texto.
-
-Introduce el nombre del campo de contenido (por defecto: content).
-
-Añade las etiquetas que quieras incluir, separadas por comas (por ejemplo: autor, tema, fecha).
-
-Elige el formato de salida deseado: JSON, JSONL, CSV o XML.
-
-Descarga el archivo generado.
+---
+Desarrollado con ❤️ por **Isabel Moyano Moreno** para mis alumnos y otros curiosos e interesados en el PLN.
