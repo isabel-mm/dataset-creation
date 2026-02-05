@@ -1,6 +1,5 @@
-# Pipeline de Estructuración de Datos para PLN
-# Desarrollado por: Moyano Moreno (2026)
-# Licencia: MIT License (o la que prefieras)
+# text2structure: conversor de texto a datos estructurados
+# Desarrollado por: Moyano Moreno, I. (2026)
 
 import streamlit as st
 import pandas as pd
@@ -61,11 +60,11 @@ def save_as_xml(data, content_key, label_keys):
     return dom.toprettyxml(indent='  ')
 
 # --- INTERFAZ DE STREAMLIT ---
-st.set_page_config(page_title="PLN Data Structurer", page_icon="🤖")
+st.set_page_config(page_title="text2structure: conversor de texto a datos estructurados", page_icon="🤖")
 
 # Título y Atribución
-st.title('Pipeline de Estructuración de Datos para PLN')
-st.caption('© 2026 Moyano Moreno. Desarrollado para la comunidad de Procesamiento del Lenguaje Natural.')
+st.title('text2structure: conversor de texto a datos estructurados')
+st.caption('© 2026 Moyano Moreno, I.')
 
 st.markdown("""
 En el **procesamiento del lenguaje natural (PLN)**, la calidad de los modelos depende directamente de la estructura del *dataset*. 
@@ -129,4 +128,4 @@ if uploaded_files:
 
 # Pie de página lateral
 st.sidebar.markdown("---")
-st.sidebar.info(f"**Cita sugerida:**\n\nMoyano Moreno (2026). *Pipeline de Estructuración de Datos para PLN* [Software].")
+st.sidebar.info(f"**Cita sugerida:**\n\nMoyano Moreno (2026). *text2structure: conversor de texto a datos estructurados* [Software].")
