@@ -1,4 +1,4 @@
-# IS-A-BUILDER: Conversor de Texto a Datos Estructurados
+# IS-A-BUILDER: conversor de texto a datos estructurados
 
 **IS-A-BUILDER** es una herramienta pedagógica diseñada para estudiantes e investigadores que se inician en el **Procesamiento del Lenguaje Natural (PLN)**. Su objetivo es facilitar la transición de archivos de texto plano (.txt) a formatos de datos estructurados e interoperables.
 
@@ -12,9 +12,9 @@
 ## 🚀 Uso
 Puedes utilizar **IS-A-BUILDER** de dos formas:
 
-### 🌐 Uso en línea (Recomendado)
-Accede directamente a la herramienta desplegada en la nube sin instalar nada:
-**[Inserta aquí el enlace de Streamlit Cloud]**
+### 🌐 Uso en línea (recomendado)
+Accede directamente a la herramienta desplegada:
+👉 **[https://is-a-builder.streamlit.app](https://is-a-builder.streamlit.app)**
 
 ### 💻 Instalación y Uso Local
 1. Clonar el repositorio.
