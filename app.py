@@ -46,6 +46,16 @@ def process_txt_files(uploaded_files, segment_by_sentences):
             structured_data.append({'fuente': file_name, 'contenido': content.strip()})
     return structured_data
 
+def process_manual_text(text, segment_by_sentences):
+    structured_data = []
+    if segment_by_sentences:
+        sentences = punkt_tokenizer.tokenize(text)
+        for sentence in sentences:
+            structured_data.append({'fuente': 'entrada_manual', 'contenido': sentence.strip()})
+    else:
+        structured_data.append({'fuente': 'entrada_manual', 'contenido': text.strip()})
+    return structured_data
+
 def save_as_xml(data, content_key, label_keys):
     root = ET.Element('corpus')
     for item in data:
@@ -82,21 +92,36 @@ with st.expander('📊 ¿Qué formato elijo para mi proyecto?'):
 
 st.divider()
 
-# --- CONFIGURACIÓN DE CARGA ---
-uploaded_files = st.file_uploader('Cargar archivos de texto (.txt)', type=['txt'], accept_multiple_files=True)
+# --- SELECCIÓN DE ENTRADA ---
+tab1, tab2 = st.tabs(["📁 Subir archivos", "✍️ Pegar texto"])
 
+structured_data = []
+
+with tab1:
+    uploaded_files = st.file_uploader('Cargar archivos de texto (.txt)', type=['txt'], accept_multiple_files=True)
+
+with tab2:
+    manual_text = st.text_area("Pega aquí el texto que deseas estructurar:", height=200)
+
+# Sidebar para configuración común
+st.sidebar.header("Configuración del dataset")
+segment_by_sentences = st.sidebar.checkbox('Tokenización por oraciones (punkt)', value=True)
+content_key = st.sidebar.text_input('Etiqueta de contenido (key)', value='texto')
+labels_input = st.sidebar.text_input('Etiquetas de metadatos', value='sentimiento, categoria')
+file_output_name = st.sidebar.text_input('Nombre del archivo de salida', value='dataset_procesado')
+
+label_keys = [label.strip() for label in labels_input.split(',')] if labels_input else []
+
+# Lógica de unión de datos
 if uploaded_files:
-    st.sidebar.header("Configuración del dataset")
-    segment_by_sentences = st.sidebar.checkbox('Tokenización por oraciones (punkt)', value=True)
-    content_key = st.sidebar.text_input('Etiqueta de contenido (key)', value='texto')
-    labels_input = st.sidebar.text_input('Etiquetas de metadatos', value='sentimiento, categoria')
-    file_output_name = st.sidebar.text_input('Nombre del archivo de salida', value='dataset_procesado')
+    structured_data.extend(process_txt_files(uploaded_files, segment_by_sentences))
 
-    label_keys = [label.strip() for label in labels_input.split(',')] if labels_input else []
-    
-    # Procesamiento
+if manual_text.strip():
+    structured_data.extend(process_manual_text(manual_text, segment_by_sentences))
+
+# --- PROCESAMIENTO Y VISUALIZACIÓN ---
+if structured_data:
     with st.spinner('Estructurando datos...'):
-        structured_data = process_txt_files(uploaded_files, segment_by_sentences)
         df = pd.DataFrame([{content_key: item['contenido'], **{key: '' for key in label_keys}} for item in structured_data])
 
     st.success(f"Procesamiento completado: {len(structured_data)} registros generados.")
@@ -126,6 +151,8 @@ if uploaded_files:
     with c4:
         xml_data = save_as_xml(structured_data, content_key, label_keys)
         st.download_button('XML', data=xml_data, file_name=f'{file_output_name}.xml', mime='application/xml', use_container_width=True)
+else:
+    st.info("Por favor, sube un archivo o escribe texto en la pestaña correspondiente para comenzar.")
 
 # Pie de página lateral
 st.sidebar.markdown("---")
