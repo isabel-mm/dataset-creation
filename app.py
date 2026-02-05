@@ -123,9 +123,9 @@ st.title('**IS-A-BUILDER**: conversor de texto a datos estructurados')
 st.caption('© 2026 Moyano Moreno, I.')
 
 st.markdown("""
-En el **procesamiento del lenguaje natural (PLN)**, la calidad de los modelos —desde clasificadores más clásicos hasta los recientes grandes modelos de lenguaje (LLM)— depende directamente de la estructura y limpieza del *dataset*.
+En el **procesamiento del lenguaje natural (PLN)**, la calidad de los modelos —desde clasificadores más clásicos hasta los recientes grandes modelos de lenguaje (LLM)— depende directamente de la compilación, estructura y limpieza del corpus lingüístico o *dataset*.
 
-**IS-A-BUILDER** ha sido diseñado específicamente como un recurso pedagógico para estudiantes y personas curiosas e interesadas en el PLN. Esta herramienta facilita la transición del texto plano (`.txt`) a formatos interoperables y estructurados (**JSON, JSONL, CSV, XML**), permitiendo una preparación de datos estandarizada.
+**IS-A-BUILDER** ha sido diseñado específicamente como un recurso pedagógico para estudiantes y personas curiosas e interesadas en el PLN. Esta herramienta facilita la transición del texto plano (`.txt`) a formatos estructurados (**JSON, JSONL, CSV, XML**), permitiendo una preparación de datos acorde a los estándares en PLN.
 """)
 
 st.divider()
