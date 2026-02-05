@@ -92,12 +92,12 @@ def save_as_xml(data, content_key, label_keys):
 # --- INTERFAZ DE STREAMLIT ---
 st.set_page_config(page_title="IS-A-BUILDER: conversor de texto a datos estructurados", page_icon="🤖", layout="wide")
 
-# --- BARRA LATERAL (FIJA) ---
-st.sidebar.header("⚙️ Configuración")
-
 # Sección de Cita (Ahora fija arriba)
 st.sidebar.info(f"**Cómo citar:**\n\nMoyano Moreno, I. (2026). *IS-A-BUILDER: conversor de texto a datos estructurados* [Software].")
 st.sidebar.markdown("---")
+
+# --- BARRA LATERAL (FIJA) ---
+st.sidebar.header("⚙️ Configuración")
 
 st.sidebar.subheader("Dataset")
 segment_by_sentences = st.sidebar.checkbox('Tokenización por oraciones (punkt)', value=True)
