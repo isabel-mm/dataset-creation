@@ -63,7 +63,7 @@ def save_as_xml(data, content_key, label_keys):
 st.set_page_config(page_title="IS-A-BUILDER: conversor de texto a datos estructurados", page_icon="🤖")
 
 # Título y Atribución
-st.title('IS-A-BUILDER: conversor de texto a datos estructurados')
+st.title('🤖 IS-A-BUILDER: conversor de texto a datos estructurados')
 st.caption('© 2026 Moyano Moreno, I.')
 
 st.markdown("""
@@ -102,7 +102,7 @@ if uploaded_files:
     st.success(f"Procesamiento completado: {len(structured_data)} registros generados.")
 
     # Vista previa
-    st.write("### Vista previa del Dataset")
+    st.write("### Vista previa del dataset")
     st.dataframe(df.head(10), use_container_width=True)
 
     st.divider()
