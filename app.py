@@ -1,3 +1,7 @@
+# Pipeline de Estructuración de Datos para PLN
+# Desarrollado por: Moyano Moreno (2026)
+# Licencia: MIT License (o la que prefieras)
+
 import streamlit as st
 import pandas as pd
 import json
@@ -59,21 +63,22 @@ def save_as_xml(data, content_key, label_keys):
 # --- INTERFAZ DE STREAMLIT ---
 st.set_page_config(page_title="PLN Data Structurer", page_icon="🤖")
 
+# Título y Atribución
 st.title('Pipeline de Estructuración de Datos para PLN')
+st.caption('© 2026 Moyano Moreno. Desarrollado para la comunidad de Procesamiento del Lenguaje Natural.')
 
 st.markdown("""
-En el **procesamiento del lenguaje natural (PLN)**, la calidad de los modelos (como Transformers o LLMs) depende directamente de la estructura del *dataset*. Convertir texto plano en formatos estructurados es el primer paso esencial para cualquier tarea de minería de texto, análisis de sentimiento o entrenamiento supervisado.
-
-Esta herramienta transforma archivos `.txt` crudos en formatos interoperables, permitiendo una recuperación de información eficiente y una preparación de datos estandarizada para flujos de trabajo científicos.
+En el **procesamiento del lenguaje natural (PLN)**, la calidad de los modelos depende directamente de la estructura del *dataset*. 
+Esta herramienta transforma archivos `.txt` crudos en formatos interoperables (JSON, CSV, XML), permitiendo una preparación de datos estandarizada para flujos de trabajo científicos y entrenamiento de modelos de IA.
 """)
 
 with st.expander('📊 ¿Qué formato elijo para mi proyecto?'):
     col_a, col_b = st.columns(2)
     with col_a:
-        st.write('**JSON / JSONL:** Ideales para modelos de Machine Learning y bases de datos NoSQL. El formato JSONL es el estándar para entrenar modelos con grandes volúmenes de datos que pueden visualizarse línea a línea.')
-        st.write('**CSV:** El estándar para análisis estadístico y manipulación con librerías como Pandas o herramientas de hojas de cálculo.')
+        st.write('**JSON / JSONL:** Estándar para modelos de Machine Learning y bases de datos NoSQL.')
+        st.write('**CSV:** Ideal para análisis estadístico y manipulación rápida en Pandas o Excel.')
     with col_b:
-        st.write('**XML:** Crucial en proyectos que requieren metadatos jerárquicos complejos o compatibilidad con muchos estándares de anotación lingüística.')
+        st.write('**XML:** Crucial para proyectos con metadatos jerárquicos y estándares de anotación lingüística.')
 
 st.divider()
 
@@ -84,13 +89,13 @@ if uploaded_files:
     st.sidebar.header("Configuración del dataset")
     segment_by_sentences = st.sidebar.checkbox('Tokenización por oraciones (Punkt)', value=True)
     content_key = st.sidebar.text_input('Etiqueta de contenido (key)', value='texto')
-    labels_input = st.sidebar.text_input('Etiquetas de metadatos (separadas por comas)', value='sentimiento, categoria')
+    labels_input = st.sidebar.text_input('Etiquetas de metadatos', value='sentimiento, categoria')
     file_output_name = st.sidebar.text_input('Nombre del archivo de salida', value='dataset_procesado')
 
     label_keys = [label.strip() for label in labels_input.split(',')] if labels_input else []
     
     # Procesamiento
-    with st.spinner('Procesando tokens...'):
+    with st.spinner('Estructurando datos...'):
         structured_data = process_txt_files(uploaded_files, segment_by_sentences)
         df = pd.DataFrame([{content_key: item['contenido'], **{key: '' for key in label_keys}} for item in structured_data])
 
@@ -108,16 +113,20 @@ if uploaded_files:
 
     with c1:
         json_str = json.dumps([{content_key: item['contenido'], **{key: [] for key in label_keys}} for item in structured_data], indent=4, ensure_ascii=False)
-        st.download_button('Descargar JSON', data=json_str, file_name=f'{file_output_name}.json', mime='application/json', use_container_width=True)
+        st.download_button('JSON', data=json_str, file_name=f'{file_output_name}.json', mime='application/json', use_container_width=True)
 
     with c2:
         jsonl_str = '\n'.join([json.dumps({content_key: item['contenido'], **{key: [] for key in label_keys}}, ensure_ascii=False) for item in structured_data])
-        st.download_button('Descargar JSONL', data=jsonl_str, file_name=f'{file_output_name}.jsonl', mime='application/jsonl', use_container_width=True)
+        st.download_button('JSONL', data=jsonl_str, file_name=f'{file_output_name}.jsonl', mime='application/jsonl', use_container_width=True)
 
     with c3:
         csv_data = df.to_csv(index=False).encode('utf-8')
-        st.download_button('Descargar CSV', data=csv_data, file_name=f'{file_output_name}.csv', mime='text/csv', use_container_width=True)
+        st.download_button('CSV', data=csv_data, file_name=f'{file_output_name}.csv', mime='text/csv', use_container_width=True)
 
     with c4:
         xml_data = save_as_xml(structured_data, content_key, label_keys)
-        st.download_button('Descargar XML', data=xml_data, file_name=f'{file_output_name}.xml', mime='application/xml', use_container_width=True)
+        st.download_button('XML', data=xml_data, file_name=f'{file_output_name}.xml', mime='application/xml', use_container_width=True)
+
+# Pie de página lateral
+st.sidebar.markdown("---")
+st.sidebar.info(f"**Cita sugerida:**\n\nMoyano Moreno (2026). *Pipeline de Estructuración de Datos para PLN* [Software].")
