@@ -93,7 +93,12 @@ def save_as_xml(data, content_key, label_keys):
 st.set_page_config(page_title="IS-A-BUILDER: conversor de texto a datos estructurados", page_icon="🤖", layout="wide")
 
 # Sección de Cita (Ahora fija arriba)
-st.sidebar.info(f"**Cómo citar:**\n\nMoyano Moreno, I. (2026). IS-A-BUILDER: conversor de texto a datos estructurados. [Software]. https://doi.org/10.5281/zenodo.18494400")
+st.sidebar.info(
+    "**Cómo citar:**\n\n"
+    "Moyano Moreno, I. (2026). *IS-A-BUILDER: conversor de texto a datos estructurados*. "
+    "[Software]. "
+    "[https://doi.org/10.5281/zenodo.18494400](https://doi.org/10.5281/zenodo.18494400)"
+)
 st.sidebar.markdown("---")
 
 # --- BARRA LATERAL (FIJA) ---
