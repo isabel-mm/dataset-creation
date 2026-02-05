@@ -92,7 +92,8 @@ def save_as_xml(data, content_key, label_keys):
 # --- INTERFAZ DE STREAMLIT ---
 st.set_page_config(page_title="IS-A-BUILDER: conversor de texto a datos estructurados", page_icon="🤖", layout="wide")
 
-# Sección de Cita (Ahora fija arriba)
+# --- BARRA LATERAL (FIJA) ---
+# Sección de Cita 
 st.sidebar.info(
     "**Cómo citar:**\n\n"
     "Moyano Moreno, I. (2026). *IS-A-BUILDER: conversor de texto a datos estructurados*. "
@@ -101,7 +102,6 @@ st.sidebar.info(
 )
 st.sidebar.markdown("---")
 
-# --- BARRA LATERAL (FIJA) ---
 st.sidebar.header("⚙️ Configuración")
 
 st.sidebar.subheader("Dataset")
@@ -119,6 +119,11 @@ file_output_name = st.sidebar.text_input('Nombre del archivo de salida', value='
 label_keys = [label.strip() for label in labels_input.split(',')] if labels_input else []
 
 # --- CUERPO PRINCIPAL ---
+
+# Inserción del Logo
+if os.path.exists("logo.png"):
+    st.image("logo.png", width=150) # Puedes ajustar el ancho (width) a tu gusto
+
 st.title('**IS-A-BUILDER**: conversor de texto a datos estructurados')
 st.caption('© 2026 Moyano Moreno, I.')
 
