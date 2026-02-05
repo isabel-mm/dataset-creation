@@ -1,4 +1,4 @@
-# text2structure: conversor de texto a datos estructurados
+# IS-A-BUILDER: conversor de texto a datos estructurados
 # Desarrollado por: Moyano Moreno, I. (2026)
 
 import streamlit as st
@@ -60,10 +60,10 @@ def save_as_xml(data, content_key, label_keys):
     return dom.toprettyxml(indent='  ')
 
 # --- INTERFAZ DE STREAMLIT ---
-st.set_page_config(page_title="text2structure: conversor de texto a datos estructurados", page_icon="🤖")
+st.set_page_config(page_title="IS-A-BUILDER: conversor de texto a datos estructurados", page_icon="🤖")
 
 # Título y Atribución
-st.title('text2structure: conversor de texto a datos estructurados')
+st.title('IS-A-BUILDER: conversor de texto a datos estructurados')
 st.caption('© 2026 Moyano Moreno, I.')
 
 st.markdown("""
@@ -128,4 +128,4 @@ if uploaded_files:
 
 # Pie de página lateral
 st.sidebar.markdown("---")
-st.sidebar.info(f"**Cómo citar:**\n\nMoyano Moreno, I. (2026). *text2structure: conversor de texto a datos estructurados* [Software].")
+st.sidebar.info(f"**Cómo citar:**\n\nMoyano Moreno, I. (2026). *IS-A-BUILDER: conversor de texto a datos estructurados* [Software].")
