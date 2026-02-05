@@ -1,4 +1,4 @@
-# IS-A-BUILDER: conversor de texto a datos estructurados
+![IS-A-BUILDER logo](logo.png)
 
 **IS-A-BUILDER** es una herramienta pedagógica diseñada para estudiantes e investigadores que se inician en el **Procesamiento del Lenguaje Natural (PLN)**. Su objetivo es facilitar la transición de archivos de texto plano (.txt) a formatos de datos estructurados e interoperables.
 
