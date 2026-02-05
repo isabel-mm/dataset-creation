@@ -118,12 +118,6 @@ file_output_name = st.sidebar.text_input('Nombre del archivo de salida', value='
 
 label_keys = [label.strip() for label in labels_input.split(',')] if labels_input else []
 
-# --- CUERPO PRINCIPAL ---
-
-# Inserción del Logo
-if os.path.exists("logo.png"):
-    st.image("logo.png", width=400)
-
 st.title('**IS-A-BUILDER**: conversor de texto a datos estructurados')
 st.caption('© 2026 Moyano Moreno, I.')
 
